@@ -21,65 +21,94 @@
 }
 body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;font-size:15px}
 
-header{display:flex;align-items:center;justify-content:space-between;padding:12px 22px;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0;z-index:1000}
-.logo{font-family:'Libre Baskerville',serif;font-size:20px;color:var(--gold)}
+/* ── HEADER ── */
+header{display:flex;align-items:center;justify-content:space-between;padding:11px 20px;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0;z-index:1000;gap:12px}
+.logo{font-family:'Libre Baskerville',serif;font-size:19px;color:var(--gold);white-space:nowrap}
 .logo em{font-style:italic;color:var(--text);opacity:.7}
-.hstats{display:flex;gap:18px;align-items:center}
-.hstat{text-align:center}
-.hstat-l{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:500}
-.hstat-v{font-size:18px;font-weight:600;color:var(--text);line-height:1.2;font-variant-numeric:tabular-nums}
-.hstat-v.g{color:var(--gold)}
-.hdiv{width:1px;height:28px;background:var(--border2)}
-.game-badge{padding:4px 12px;border-radius:20px;background:var(--gold-dim);border:1px solid rgba(201,146,74,.3);font-size:11px;font-weight:600;color:var(--gold);letter-spacing:.5px}
 
-.modebar{display:flex;gap:6px;padding:10px 22px;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0;align-items:center}
-.mbtn{padding:5px 14px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--muted2);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s}
+/* Switch game button in header */
+.switch-btn{padding:5px 13px;border-radius:17px;border:1px solid var(--border2);background:transparent;color:var(--muted2);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0}
+.switch-btn:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ── GAME SELECT SCREEN ── */
+#game-select{
+  position:fixed;inset:0;z-index:2000;
+  background:var(--bg);
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+}
+.gs-logo{font-family:'Libre Baskerville',serif;font-size:32px;color:var(--gold);margin-bottom:6px;letter-spacing:.5px}
+.gs-logo em{font-style:italic;color:var(--text);opacity:.7}
+.gs-tagline{font-size:14px;color:var(--muted2);margin-bottom:44px;text-align:center}
+.gs-cards{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;padding:0 24px}
+.gs-cards{align-items:stretch}
+.gs-card{
+  width:200px;background:var(--s1);border:1px solid var(--border2);border-radius:16px;
+  padding:28px 20px 24px;display:flex;flex-direction:column;align-items:center;gap:10px;
+  cursor:pointer;transition:all .2s;text-align:center;
+}
+.gs-card .gs-btn{margin-top:auto}
+.gs-card:hover{border-color:var(--gold);background:var(--s2);transform:translateY(-3px)}
+.gs-card:active{transform:translateY(0)}
+.gs-icon{font-size:44px;line-height:1;margin-bottom:4px}
+.gs-title{font-family:'Libre Baskerville',serif;font-size:18px;font-weight:700;color:var(--text)}
+.gs-desc{font-size:12px;color:var(--muted2);line-height:1.5}
+.gs-btn{margin-top:8px;padding:9px 22px;border-radius:20px;border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
+.gs-btn.world{background:var(--blue);color:#fff}
+.gs-btn.us{background:var(--gold);color:#0a0e14}
+.gs-card:hover .gs-btn.world{filter:brightness(1.15)}
+.gs-card:hover .gs-btn.us{background:var(--gold-l)}
+
+.hstats{display:flex;gap:14px;align-items:center}
+.hstat{text-align:center}
+.hstat-l{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:500}
+.hstat-v{font-size:17px;font-weight:600;color:var(--text);line-height:1.2;font-variant-numeric:tabular-nums}
+.hstat-v.g{color:var(--gold)}
+.hdiv{width:1px;height:24px;background:var(--border2)}
+.game-badge{padding:3px 10px;border-radius:20px;background:var(--gold-dim);border:1px solid rgba(201,146,74,.3);font-size:10px;font-weight:600;color:var(--gold);letter-spacing:.5px;white-space:nowrap}
+
+/* ── MODE BAR ── */
+.modebar{display:flex;gap:6px;padding:9px 20px;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0;align-items:center}
+.mbtn{padding:5px 13px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--muted2);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s}
 .mbtn.active{border-color:var(--gold);color:var(--gold);background:var(--gold-dim)}
 .mbtn:hover:not(.active){color:var(--text)}
 .mode-desc{margin-left:auto;font-size:11px;color:var(--muted);font-style:italic}
 
+/* ── LAYOUT ── */
 .main{display:flex;flex:1;overflow:hidden;position:relative}
 #map{flex:1;z-index:1}
-.sidebar{width:360px;flex-shrink:0;background:var(--s1);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;position:relative}
+.sidebar{width:360px;flex-shrink:0;background:var(--s1);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;position:relative}
 
-/* Difficulty banner */
-.diff-banner{
-  padding:7px 22px;border-bottom:1px solid var(--border);
-  flex-shrink:0;display:flex;align-items:center;justify-content:space-between;
-}
+/* ── DIFFICULTY BANNER ── */
+.diff-banner{padding:7px 20px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
 .diff-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
 .diff-pips{display:flex;gap:4px;align-items:center}
 .pip{width:18px;height:4px;border-radius:2px;background:var(--s3);transition:background .4s}
-.pip.on.d1{background:#3dba6f}
-.pip.on.d2{background:#c9924a}
-.pip.on.d3{background:#e05555}
+.pip.on.d1{background:#3dba6f}.pip.on.d2{background:#c9924a}.pip.on.d3{background:#e05555}
 .diff-name{font-size:11px;font-weight:600;letter-spacing:.3px}
-.diff-name.d1{color:#3dba6f}
-.diff-name.d2{color:#c9924a}
-.diff-name.d3{color:#e05555}
+.diff-name.d1{color:#3dba6f}.diff-name.d2{color:#c9924a}.diff-name.d3{color:#e05555}
 
-/* Progress dots */
-.prog-bar-wrap{padding:10px 22px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;gap:10px}
+/* ── PROGRESS DOTS ── */
+.prog-bar-wrap{padding:9px 20px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;gap:10px}
 .prog-dots{display:flex;gap:5px;flex:1}
 .pdot{width:100%;height:6px;border-radius:3px;background:var(--s3);transition:background .4s}
-.pdot.p1c{background:var(--green)}
-.pdot.p2c{background:var(--gold)}
-.pdot.miss{background:var(--red)}
+.pdot.p1c{background:var(--green)}.pdot.p2c{background:var(--gold)}.pdot.miss{background:var(--red)}
 .pdot.cur{background:var(--blue);animation:pdot-pulse 1s infinite alternate}
 @keyframes pdot-pulse{from{opacity:.5}to{opacity:1}}
 .prog-label{font-size:11px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
 
-.phase-header{padding:16px 22px 0;flex-shrink:0}
+/* ── PHASE HEADER ── */
+.phase-header{padding:14px 20px 0;flex-shrink:0}
 .phase-pill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;transition:all .3s}
 .phase-pill.p1{background:var(--blue-dim);color:var(--blue);border:1px solid rgba(74,144,217,.25)}
 .phase-pill.p2{background:var(--gold-dim);color:var(--gold);border:1px solid rgba(201,146,74,.25)}
 .phase-pill .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
 .question{font-family:'Libre Baskerville',serif;font-size:16px;line-height:1.55;color:var(--text);padding-bottom:4px}
 .question strong{color:var(--gold-l)}
-.region-tag{font-size:11px;color:var(--muted);padding-bottom:14px;display:flex;align-items:center;gap:5px}
+.region-tag{font-size:11px;color:var(--muted);padding-bottom:12px;display:flex;align-items:center;gap:5px}
 .region-tag::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--muted);opacity:.4}
 
-.timer-wrap{padding:0 22px 14px;flex-shrink:0}
+/* ── TIMER ── */
+.timer-wrap{padding:0 20px 12px;flex-shrink:0}
 .timer-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
 .timer-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
 .timer-count{font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--text);transition:color .3s}
@@ -88,22 +117,24 @@ header{display:flex;align-items:center;justify-content:space-between;padding:12p
 .timer-bar-fill{height:100%;border-radius:3px;background:var(--blue);transition:width .1s linear,background .3s}
 .timer-bar-fill.warn{background:#e08c3d}.timer-bar-fill.danger{background:var(--red)}
 
-.input-area{padding:0 22px 14px;flex-shrink:0}
+/* ── INPUT ── */
+.input-area{padding:0 20px 12px;flex-shrink:0}
 .input-row{display:flex;gap:8px}
 .geo-input{flex:1;padding:11px 14px;background:var(--s2);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;outline:none;transition:border-color .15s,background .15s}
 .geo-input::placeholder{color:var(--muted)}
 .geo-input:focus{border-color:var(--blue)}
 .geo-input.correct-flash{border-color:var(--green);background:var(--green-dim)}
 .geo-input.wrong-flash{border-color:var(--red);background:var(--red-dim)}
-.submit-btn{padding:11px 16px;background:var(--blue);color:#fff;border:none;border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap}
+.submit-btn{padding:11px 14px;background:var(--blue);color:#fff;border:none;border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap}
 .submit-btn:hover{filter:brightness(1.1)}
 .skip-btn{width:100%;margin-top:8px;padding:9px;background:transparent;border:1px dashed var(--border2);border-radius:var(--r);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;transition:all .15s}
 .skip-btn:hover{border-color:var(--gold);color:var(--gold)}
 
-.p2-intro{padding:0 22px 12px;flex-shrink:0;font-size:12px;color:var(--muted2);font-style:italic;line-height:1.5}
+/* ── CHOICES ── */
+.p2-intro{padding:0 20px 10px;flex-shrink:0;font-size:12px;color:var(--muted2);font-style:italic;line-height:1.5}
 .p2-intro strong{color:var(--gold);font-style:normal;font-weight:500}
-.choices-area{padding:0 22px;display:flex;flex-direction:column;gap:9px;flex-shrink:0}
-.choice{padding:13px 16px;background:var(--s2);border:1px solid var(--border2);border-radius:var(--r);cursor:pointer;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;display:flex;align-items:center;gap:12px;transition:all .15s;text-align:left;width:100%}
+.choices-area{padding:0 20px;display:flex;flex-direction:column;gap:8px;flex-shrink:0}
+.choice{padding:12px 15px;background:var(--s2);border:1px solid var(--border2);border-radius:var(--r);cursor:pointer;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;display:flex;align-items:center;gap:12px;transition:all .15s;text-align:left;width:100%}
 .choice:hover:not(:disabled){border-color:var(--gold);background:var(--gold-dim);transform:translateX(3px)}
 .choice .ltr{width:24px;height:24px;border-radius:6px;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--muted);flex-shrink:0;transition:all .15s}
 .choice.correct{border-color:var(--green);background:var(--green-dim)}
@@ -112,7 +143,8 @@ header{display:flex;align-items:center;justify-content:space-between;padding:12p
 .choice.wrong .ltr{background:var(--red);color:#fff}
 .choice:disabled{cursor:not-allowed}
 
-.feedback-area{padding:14px 22px;border-top:1px solid var(--border);flex-shrink:0;min-height:108px;display:flex;flex-direction:column;justify-content:center;gap:7px;margin-top:auto}
+/* ── FEEDBACK ── */
+.feedback-area{padding:12px 20px;border-top:1px solid var(--border);flex-shrink:0;display:flex;flex-direction:column;gap:7px}
 .fb-msg{font-size:14px;font-weight:600;display:none}
 .fb-msg.show{display:block}
 .fb-msg.ok{color:var(--green)}.fb-msg.nope{color:var(--red)}
@@ -123,47 +155,54 @@ header{display:flex;align-items:center;justify-content:space-between;padding:12p
 .fb-pts.zero{background:var(--red-dim);color:var(--red)}
 .fb-detail{font-size:12px;color:var(--muted2);line-height:1.55;display:none}
 .fb-detail.show{display:block}
-.next-btn{padding:10px 18px;background:var(--gold);color:#0a0e14;border:none;border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;display:none;transition:all .15s}
+.next-btn{padding:13px 18px;background:var(--gold);color:#0a0e14;border:none;border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;display:none;transition:all .15s;width:100%;text-align:center}
 .next-btn:hover{background:var(--gold-l);transform:translateY(-1px)}
 .next-btn.show{display:block}
 
 /* ── RESULTS OVERLAY ── */
 #results-overlay{position:absolute;inset:0;z-index:200;background:var(--s1);display:none;flex-direction:column;overflow-y:auto}
 #results-overlay.show{display:flex}
-
-.res-top{padding:22px 24px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.res-top{padding:20px 22px 14px;border-bottom:1px solid var(--border);flex-shrink:0}
 .res-game-num{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:4px}
 .res-title{font-family:'Libre Baskerville',serif;font-size:22px;color:var(--gold);font-weight:700}
 .res-subtitle{font-size:13px;color:var(--muted2);margin-top:3px}
-
-.res-scorebox{margin:16px 24px 0;background:var(--s2);border-radius:var(--r);border:1px solid var(--border2);padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0}
+.res-scorebox{margin:14px 22px 0;background:var(--s2);border-radius:var(--r);border:1px solid var(--border2);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0}
 .res-score-main{display:flex;flex-direction:column}
-.res-score-val{font-size:36px;font-weight:700;color:var(--gold);line-height:1;font-variant-numeric:tabular-nums}
+.res-score-val{font-size:34px;font-weight:700;color:var(--gold);line-height:1;font-variant-numeric:tabular-nums}
 .res-score-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:3px}
 .res-score-change{font-size:13px;font-weight:500;padding:4px 10px;border-radius:6px}
 .res-score-change.up{background:var(--green-dim);color:var(--green)}
 .res-score-change.down{background:var(--red-dim);color:var(--red)}
 .res-score-change.same{background:var(--s3);color:var(--muted2)}
 
-.res-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding:14px 24px 0;flex-shrink:0}
-.res-stat{background:var(--s2);border-radius:var(--r);border:1px solid var(--border2);padding:12px 14px;text-align:center}
-.res-stat-v{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
-.res-stat-v.g{color:var(--green)}.res-stat-v.a{color:var(--gold)}.res-stat-v.r{color:var(--red)}
-.res-stat-l{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-top:2px}
+/* Accuracy */
+.res-accuracy{margin:12px 22px 0;flex-shrink:0}
+.acc-row{display:flex;align-items:center;gap:14px;margin-bottom:10px}
+.acc-pct{font-size:40px;font-weight:700;color:var(--gold);line-height:1;font-variant-numeric:tabular-nums}
+.acc-right{display:flex;flex-direction:column;gap:2px}
+.acc-label{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:500}
+.acc-sub{font-size:12px;color:var(--muted2)}
+.breakdown-bar{height:10px;border-radius:5px;overflow:hidden;display:flex;gap:2px;margin-bottom:6px}
+.bb-seg{height:100%;border-radius:3px;transition:width .6s cubic-bezier(.4,0,.2,1);min-width:0}
+.bb-seg.green{background:var(--green)}.bb-seg.amber{background:var(--gold)}.bb-seg.red{background:var(--red)}
+.breakdown-legend{display:flex;gap:12px}
+.bl-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted2)}
+.bl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 
-/* Next game difficulty preview */
-.res-next-diff{margin:14px 24px 0;background:var(--s2);border-radius:var(--r);border:1px solid var(--border2);padding:14px 18px;flex-shrink:0}
-.rnd-label{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:500;margin-bottom:10px}
-.rnd-row{display:flex;align-items:center;gap:10px}
-.rnd-pips{display:flex;gap:4px}
-.rnd-pip{width:24px;height:5px;border-radius:3px}
-.rnd-pip.on.d1{background:#3dba6f}.rnd-pip.on.d2{background:#c9924a}.rnd-pip.on.d3{background:#e05555}
-.rnd-pip.off{background:var(--s3)}
-.rnd-desc{font-size:13px;color:var(--text);font-weight:500}
-.rnd-sub{font-size:11px;color:var(--muted2);margin-top:4px;line-height:1.4}
+/* Missed list */
+.res-missed{padding:12px 22px 0;flex-shrink:0}
+.res-missed-title{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:8px;font-weight:500}
+.missed-list{display:flex;flex-direction:column;gap:6px}
+.missed-item{background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.missed-country{font-size:13px;font-weight:500;color:var(--text)}
+.missed-capital{font-size:12px;color:var(--muted2)}
+.missed-tag{font-size:10px;padding:2px 7px;border-radius:10px;white-space:nowrap;flex-shrink:0}
+.missed-tag.miss{background:var(--red-dim);color:var(--red)}
+.missed-tag.hint{background:var(--gold-dim);color:var(--gold)}
+.no-missed{font-size:13px;color:var(--green);font-style:italic}
 
 /* Compare bars */
-.res-compare{padding:14px 24px 0;flex-shrink:0}
+.res-compare{padding:12px 22px 0;flex-shrink:0}
 .res-compare-title{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px;font-weight:500}
 .compare-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
 .compare-label{font-size:12px;color:var(--muted2);width:70px;flex-shrink:0}
@@ -177,7 +216,7 @@ header{display:flex;align-items:center;justify-content:space-between;padding:12p
 .leg-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)}
 .leg-pip{width:10px;height:4px;border-radius:2px}
 
-.res-cta{padding:18px 24px;flex-shrink:0;margin-top:auto;border-top:1px solid var(--border)}
+.res-cta{padding:16px 22px;flex-shrink:0;margin-top:auto;border-top:1px solid var(--border)}
 .play-again-btn{width:100%;padding:14px;background:var(--gold);color:#0a0e14;border:none;border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .15s}
 .play-again-btn:hover{background:var(--gold-l);transform:translateY(-1px)}
 
@@ -186,8 +225,29 @@ header{display:flex;align-items:center;justify-content:space-between;padding:12p
 </head>
 <body>
 
+<!-- GAME SELECTION SCREEN -->
+<div id="game-select">
+  <div class="gs-logo">Geo<em>Quest</em></div>
+  <div class="gs-tagline">Choose your challenge to get started</div>
+  <div class="gs-cards">
+    <div class="gs-card" onclick="selectGame('world')">
+      <div class="gs-icon">🌍</div>
+      <div class="gs-title">World</div>
+      <div class="gs-desc">Capitals &amp; countries from every continent. Adaptive difficulty from easy to expert.</div>
+      <button class="gs-btn world">Play World</button>
+    </div>
+    <div class="gs-card" onclick="selectGame('us')">
+      <div class="gs-icon">🇺🇸</div>
+      <div class="gs-title">USA</div>
+      <div class="gs-desc">All 50 US state capitals — from obvious to the ones that always trip you up.</div>
+      <button class="gs-btn us">Play USA</button>
+    </div>
+  </div>
+</div>
+
 <header>
   <div class="logo">Geo<em>Quest</em></div>
+  <button class="switch-btn" onclick="showGameSelect()">⇄ Switch game</button>
   <div class="hstats">
     <div class="hstat"><div class="hstat-l">Score</div><div class="hstat-v g" id="sc">0</div></div>
     <div class="hdiv"></div>
@@ -200,8 +260,8 @@ header{display:flex;align-items:center;justify-content:space-between;padding:12p
 </header>
 
 <div class="modebar">
-  <button class="mbtn active" onclick="setMode('capital',this)">Capitals</button>
-  <button class="mbtn" onclick="setMode('country',this)">Countries</button>
+  <button class="mbtn active" id="mb-capital" onclick="setMode('capital',this)">Capitals</button>
+  <button class="mbtn" id="mb-place" onclick="setMode('place',this)">Countries</button>
   <button class="mbtn" onclick="setMode('mixed',this)">Mixed</button>
   <span class="mode-desc" id="mode-desc">Name the capital city</span>
 </div>
@@ -276,27 +336,27 @@ header{display:flex;align-items:center;justify-content:space-between;padding:12p
         <div class="res-score-change" id="res-score-change" style="display:none"></div>
       </div>
 
-      <div class="res-stats">
-        <div class="res-stat"><div class="res-stat-v g" id="res-p1c">0</div><div class="res-stat-l">Unaided</div></div>
-        <div class="res-stat"><div class="res-stat-v a" id="res-p2c">0</div><div class="res-stat-l">With hints</div></div>
-        <div class="res-stat"><div class="res-stat-v r" id="res-miss">0</div><div class="res-stat-l">Missed</div></div>
-      </div>
-
-      <!-- Next game difficulty preview -->
-      <div class="res-next-diff" id="res-next-diff">
-        <div class="rnd-label">Next game</div>
-        <div class="rnd-row">
-          <div class="rnd-pips" id="rnd-pips">
-            <div class="rnd-pip off"></div><div class="rnd-pip off"></div><div class="rnd-pip off"></div>
+      <div class="res-accuracy">
+        <div class="acc-row">
+          <div class="acc-pct" id="res-acc-pct">0%</div>
+          <div class="acc-right">
+            <div class="acc-label">Accuracy</div>
+            <div class="acc-sub" id="res-acc-sub"></div>
           </div>
-          <div>
-            <div class="rnd-desc" id="rnd-desc">Starter</div>
-            <div class="rnd-sub" id="rnd-sub"></div>
-          </div>
+        </div>
+        <div class="breakdown-bar" id="res-breakdown-bar"></div>
+        <div class="breakdown-legend">
+          <div class="bl-item"><div class="bl-dot" style="background:var(--green)"></div><span id="res-p1c-l">0 unaided</span></div>
+          <div class="bl-item"><div class="bl-dot" style="background:var(--gold)"></div><span id="res-p2c-l">0 with hints</span></div>
+          <div class="bl-item"><div class="bl-dot" style="background:var(--red)"></div><span id="res-miss-l">0 missed</span></div>
         </div>
       </div>
 
-      <!-- Progress vs last game (game 2+) -->
+      <div class="res-missed">
+        <div class="res-missed-title">To review</div>
+        <div class="missed-list" id="missed-list"></div>
+      </div>
+
       <div class="res-compare" id="res-compare" style="display:none">
         <div class="res-compare-title">Progress vs last game</div>
         <div class="compare-row">
@@ -329,20 +389,17 @@ header{display:flex;align-items:center;justify-content:space-between;padding:12p
       <div class="res-cta">
         <button class="play-again-btn" onclick="startNextGame()">Play Game <span id="next-game-num">2</span> →</button>
       </div>
-    </div><!-- /results-overlay -->
+    </div>
 
   </div>
 </div>
 
 <script>
-/* ──────────────────────────────────────────
-   DIFFICULTY TIERS
-   1 = Easy   – iconic capitals everyone knows
-   2 = Medium – requires some geography study
-   3 = Hard   – specialist knowledge, Africa, Central Asia, small nations
-────────────────────────────────────────── */
-const LOCS = [
-  // ── Tier 1: Easy ──────────────────────────────────────────────────
+/* ════════════════════════════════════════════
+   WORLD DATA
+════════════════════════════════════════════ */
+const WORLD_LOCS = [
+  // Tier 1
   {name:"France",capital:"Paris",lat:48.8566,lng:2.3522,region:"Western Europe",tier:1},
   {name:"Germany",capital:"Berlin",lat:52.5200,lng:13.4050,region:"Central Europe",tier:1},
   {name:"Italy",capital:"Rome",lat:41.9028,lng:12.4964,region:"Southern Europe",tier:1},
@@ -372,8 +429,7 @@ const LOCS = [
   {name:"Kenya",capital:"Nairobi",lat:-1.2921,lng:36.8219,region:"East Africa",tier:1},
   {name:"Nigeria",capital:"Abuja",lat:9.0765,lng:7.3986,region:"West Africa",tier:1},
   {name:"Indonesia",capital:"Jakarta",lat:-6.2088,lng:106.8456,region:"Southeast Asia",tier:1},
-
-  // ── Tier 2: Medium ─────────────────────────────────────────────────
+  // Tier 2
   {name:"Poland",capital:"Warsaw",lat:52.2297,lng:21.0122,region:"Central Europe",tier:2},
   {name:"Austria",capital:"Vienna",lat:48.2082,lng:16.3738,region:"Central Europe",tier:2},
   {name:"Switzerland",capital:"Bern",lat:46.9481,lng:7.4474,region:"Central Europe",tier:2},
@@ -413,8 +469,7 @@ const LOCS = [
   {name:"Nepal",capital:"Kathmandu",lat:27.7172,lng:85.3240,region:"South Asia",tier:2},
   {name:"Lebanon",capital:"Beirut",lat:33.8886,lng:35.4955,region:"Middle East",tier:2},
   {name:"Algeria",capital:"Algiers",lat:36.7372,lng:3.0865,region:"North Africa",tier:2},
-
-  // ── Tier 3: Hard ───────────────────────────────────────────────────
+  // Tier 3
   {name:"Slovakia",capital:"Bratislava",lat:48.1486,lng:17.1077,region:"Central Europe",tier:3},
   {name:"Luxembourg",capital:"Luxembourg City",lat:49.6116,lng:6.1319,region:"Western Europe",tier:3},
   {name:"Slovenia",capital:"Ljubljana",lat:46.0569,lng:14.5058,region:"Southern Europe",tier:3},
@@ -454,7 +509,6 @@ const LOCS = [
   {name:"Namibia",capital:"Windhoek",lat:-22.5597,lng:17.0832,region:"Southern Africa",tier:3},
   {name:"DR Congo",capital:"Kinshasa",lat:-4.3217,lng:15.3222,region:"Central Africa",tier:3},
   {name:"Cameroon",capital:"Yaoundé",lat:3.8480,lng:11.5021,region:"Central Africa",tier:3},
-  {name:"Gabon",capital:"Libreville",lat:0.3901,lng:9.4544,region:"Central Africa",tier:3},
   {name:"Ecuador",capital:"Quito",lat:-0.1807,lng:-78.4678,region:"South America",tier:3},
   {name:"Bolivia",capital:"Sucre",lat:-19.0196,lng:-65.2619,region:"South America",tier:3},
   {name:"Paraguay",capital:"Asunción",lat:-25.2867,lng:-57.6470,region:"South America",tier:3},
@@ -470,7 +524,7 @@ const LOCS = [
   {name:"Taiwan",capital:"Taipei",lat:25.0329,lng:121.5654,region:"East Asia",tier:3},
 ];
 
-const ADJ={
+const WORLD_ADJ = {
   "Western Europe":["Central Europe","Southern Europe","Northern Europe"],
   "Central Europe":["Western Europe","Eastern Europe","Southern Europe","Northern Europe"],
   "Southern Europe":["Western Europe","Central Europe","Eastern Europe","North Africa","Middle East"],
@@ -493,148 +547,292 @@ const ADJ={
   "Oceania":["Southeast Asia","East Asia"],
 };
 
-/* ── DIFFICULTY ENGINE ──────────────────────────────────────────────
-   scoringRate = p1c fraction from last game (0–1)
-   gameDiff: 1=Starter, 2=Explorer, 3=Expert
-   Tier mix per gameDiff:
-     1 → 100% tier1
-     2 → 40% tier1, 60% tier2
-     3 → 10% tier1, 40% tier2, 50% tier3
-────────────────────────────────────────── */
-const DIFF_META = {
-  1:{name:"Starter",cls:"d1",pips:1,sub:"Iconic world capitals — a confidence builder."},
-  2:{name:"Explorer",cls:"d2",pips:2,sub:"Broader geography — time to level up."},
-  3:{name:"Expert",cls:"d3",pips:3,sub:"Specialist knowledge — Africa, Central Asia & more."},
+/* ════════════════════════════════════════════
+   US STATES DATA
+   name = state, capital = capital city
+   region = US geographic region for smart distractors
+   Tier 1 = capital IS the major/obvious city
+   Tier 2 = capital is different from most-famous city (tricky!)
+   Tier 3 = obscure capitals most people don't know
+════════════════════════════════════════════ */
+const US_LOCS = [
+  // Tier 1 — capital is well-known / obvious
+  {name:"Alaska",capital:"Juneau",lat:58.3005,lng:-134.4197,region:"West",tier:2},
+  {name:"Arizona",capital:"Phoenix",lat:33.4484,lng:-112.0740,region:"Southwest",tier:1},
+  {name:"Colorado",capital:"Denver",lat:39.7392,lng:-104.9903,region:"West",tier:1},
+  {name:"Georgia",capital:"Atlanta",lat:33.7490,lng:-84.3880,region:"Southeast",tier:1},
+  {name:"Hawaii",capital:"Honolulu",lat:21.3069,lng:-157.8583,region:"Pacific",tier:1},
+  {name:"Idaho",capital:"Boise",lat:43.6150,lng:-116.2023,region:"West",tier:1},
+  {name:"Indiana",capital:"Indianapolis",lat:39.7684,lng:-86.1581,region:"Midwest",tier:1},
+  {name:"Massachusetts",capital:"Boston",lat:42.3601,lng:-71.0589,region:"Northeast",tier:1},
+  {name:"Nevada",capital:"Carson City",lat:39.1638,lng:-119.7674,region:"West",tier:2},
+  {name:"New Mexico",capital:"Santa Fe",lat:35.6870,lng:-105.9378,region:"Southwest",tier:1},
+  {name:"Ohio",capital:"Columbus",lat:39.9612,lng:-82.9988,region:"Midwest",tier:1},
+  {name:"Oklahoma",capital:"Oklahoma City",lat:35.4676,lng:-97.5164,region:"Southwest",tier:1},
+  {name:"Tennessee",capital:"Nashville",lat:36.1627,lng:-86.7816,region:"Southeast",tier:1},
+  {name:"Texas",capital:"Austin",lat:30.2672,lng:-97.7431,region:"Southwest",tier:1},
+  {name:"Utah",capital:"Salt Lake City",lat:40.7608,lng:-111.8910,region:"West",tier:1},
+  {name:"Virginia",capital:"Richmond",lat:37.5407,lng:-77.4360,region:"Southeast",tier:2},
+  // Tier 2 — tricky: capital ≠ most famous city
+  {name:"Alabama",capital:"Montgomery",lat:32.3792,lng:-86.3077,region:"Southeast",tier:2},
+  {name:"California",capital:"Sacramento",lat:38.5816,lng:-121.4944,region:"West",tier:2},
+  {name:"Connecticut",capital:"Hartford",lat:41.7658,lng:-72.6851,region:"Northeast",tier:2},
+  {name:"Delaware",capital:"Dover",lat:39.1582,lng:-75.5244,region:"Northeast",tier:2},
+  {name:"Florida",capital:"Tallahassee",lat:30.4383,lng:-84.2807,region:"Southeast",tier:2},
+  {name:"Illinois",capital:"Springfield",lat:39.7984,lng:-89.6542,region:"Midwest",tier:2},
+  {name:"Kansas",capital:"Topeka",lat:39.0558,lng:-95.6890,region:"Midwest",tier:2},
+  {name:"Kentucky",capital:"Frankfort",lat:38.2009,lng:-84.8733,region:"Southeast",tier:3},
+  {name:"Louisiana",capital:"Baton Rouge",lat:30.4515,lng:-91.1871,region:"Southeast",tier:2},
+  {name:"Maine",capital:"Augusta",lat:44.3106,lng:-69.7795,region:"Northeast",tier:3},
+  {name:"Maryland",capital:"Annapolis",lat:38.9784,lng:-76.4922,region:"Mid-Atlantic",tier:2},
+  {name:"Michigan",capital:"Lansing",lat:42.7325,lng:-84.5555,region:"Midwest",tier:2},
+  {name:"Minnesota",capital:"Saint Paul",lat:44.9537,lng:-93.0900,region:"Midwest",tier:2},
+  {name:"Mississippi",capital:"Jackson",lat:32.2988,lng:-90.1848,region:"Southeast",tier:2},
+  {name:"Missouri",capital:"Jefferson City",lat:38.5767,lng:-92.1735,region:"Midwest",tier:3},
+  {name:"Montana",capital:"Helena",lat:46.5958,lng:-112.0270,region:"West",tier:3},
+  {name:"Nebraska",capital:"Lincoln",lat:40.8136,lng:-96.7026,region:"Midwest",tier:2},
+  {name:"New Hampshire",capital:"Concord",lat:43.2081,lng:-71.5376,region:"Northeast",tier:3},
+  {name:"New Jersey",capital:"Trenton",lat:40.2171,lng:-74.7429,region:"Mid-Atlantic",tier:2},
+  {name:"New York",capital:"Albany",lat:42.6526,lng:-73.7562,region:"Northeast",tier:2},
+  {name:"North Carolina",capital:"Raleigh",lat:35.7796,lng:-78.6382,region:"Southeast",tier:2},
+  {name:"North Dakota",capital:"Bismarck",lat:46.8083,lng:-100.7837,region:"Midwest",tier:3},
+  {name:"Oregon",capital:"Salem",lat:44.9429,lng:-123.0351,region:"West",tier:2},
+  {name:"Pennsylvania",capital:"Harrisburg",lat:40.2732,lng:-76.8867,region:"Mid-Atlantic",tier:2},
+  {name:"Rhode Island",capital:"Providence",lat:41.8240,lng:-71.4128,region:"Northeast",tier:2},
+  {name:"South Carolina",capital:"Columbia",lat:34.0007,lng:-81.0348,region:"Southeast",tier:2},
+  {name:"South Dakota",capital:"Pierre",lat:44.3683,lng:-100.3510,region:"Midwest",tier:3},
+  {name:"Vermont",capital:"Montpelier",lat:44.2601,lng:-72.5754,region:"Northeast",tier:3},
+  {name:"Washington",capital:"Olympia",lat:47.0379,lng:-122.9007,region:"West",tier:2},
+  {name:"West Virginia",capital:"Charleston",lat:38.3498,lng:-81.6326,region:"Mid-Atlantic",tier:2},
+  {name:"Wisconsin",capital:"Madison",lat:43.0731,lng:-89.4012,region:"Midwest",tier:2},
+  {name:"Wyoming",capital:"Cheyenne",lat:41.1400,lng:-104.8202,region:"West",tier:2},
+  {name:"Arkansas",capital:"Little Rock",lat:34.7465,lng:-92.2896,region:"Southeast",tier:2},
+  {name:"Iowa",capital:"Des Moines",lat:41.5868,lng:-93.6250,region:"Midwest",tier:2},
+];
+
+const US_ADJ = {
+  "Northeast":["Mid-Atlantic","Midwest"],
+  "Mid-Atlantic":["Northeast","Southeast","Midwest"],
+  "Southeast":["Mid-Atlantic","Midwest","Southwest"],
+  "Midwest":["Northeast","Mid-Atlantic","Southeast","Southwest","West"],
+  "Southwest":["Southeast","Midwest","West"],
+  "West":["Southwest","Midwest","Pacific"],
+  "Pacific":["West"],
 };
 
+/* ════════════════════════════════════════════
+   ENGINE CONSTANTS
+════════════════════════════════════════════ */
+const DIFF_META = {
+  1:{name:"Starter",cls:"d1",pips:1},
+  2:{name:"Explorer",cls:"d2",pips:2},
+  3:{name:"Expert",cls:"d3",pips:3},
+};
 const TIER_MIX = {
   1:[{tier:1,count:10}],
   2:[{tier:1,count:4},{tier:2,count:6}],
   3:[{tier:1,count:1},{tier:2,count:4},{tier:3,count:5}],
 };
-
-/* p1c rate thresholds to advance difficulty */
-const UP_THRESHOLD   = 0.70; // ≥70% unaided → go harder
-const DOWN_THRESHOLD = 0.40; // <40% unaided → go easier
-
+const UP_THRESHOLD   = 0.70;
+const DOWN_THRESHOLD = 0.40;
 const GAME_LEN = 10;
 const RETRY_MAX = 3;
 
+/* ════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════ */
 let map, marker, timerInterval;
-let gameNum = 0, score = 0, streak = 0;
-let gameDiff = 1;          // current difficulty (1/2/3)
-let prevStats = null;
+// Per game-type, keep separate state so switching doesn't reset progress
+let gameType = 'world'; // 'world' | 'us'
 let gameMode = 'capital';
 
-// Per-game state
-let gamePool = [], gameIdx = 0, gameHistory = [];
-let weakLocs = [];
+const state = {
+  world: { gameNum:0, score:0, streak:0, gameDiff:1, prevStats:null, weakLocs:[], tierPools:{1:[],2:[],3:[]}, gamePool:[], gameIdx:0, gameHistory:[] },
+  us:    { gameNum:0, score:0, streak:0, gameDiff:1, prevStats:null, weakLocs:[], tierPools:{1:[],2:[],3:[]}, gamePool:[], gameIdx:0, gameHistory:[] },
+};
 
-// Pools per tier (shuffled, consumed across games)
-let tierPools = {1:[],2:[],3:[]};
+function gs(){ return state[gameType]; }
+function currentDataset(){ return gameType==='us' ? US_LOCS : WORLD_LOCS; }
+function currentAdj(){ return gameType==='us' ? US_ADJ : WORLD_ADJ; }
+function currentZoom(){ return gameType==='us' ? 5 : 4; }
+function placeName(){ return gameType==='us' ? 'state' : 'country'; }
 
+let curLoc, qType, correctAnswer, answered=false, phase=1, timeLeft=30;
+
+/* ════════════════════════════════════════════
+   MAP INIT
+════════════════════════════════════════════ */
 function initMap(){
-  map = L.map('map',{center:[20,10],zoom:2,zoomControl:true,attributionControl:false});
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:10}).addTo(map);
-  resetTierPools();
+  map = L.map('map',{center:[20,0],zoom:2,zoomControl:true,attributionControl:false});
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',{maxZoom:12}).addTo(map);
+  resetTierPools('world');
+  resetTierPools('us');
+}
+
+/* ════════════════════════════════════════════
+   GAME SELECT SCREEN
+════════════════════════════════════════════ */
+function showGameSelect(){
+  clearTI();
+  document.getElementById('game-select').style.display='flex';
+}
+
+function selectGame(t){
+  document.getElementById('game-select').style.display='none';
+  if(gameType===t && gs().gamePool.length>0){
+    // Same game already running — just resume
+    return;
+  }
+  gameType = t;
+  clearTI();
+  hideResults();
+  updateModeLabels();
+  if(t==='us') map.flyTo([39.5,-98.35],4,{duration:1.2});
+  else map.flyTo([20,0],2,{duration:1.2});
+  syncHeaderStats();
+  updateDiffUI(gs().gameDiff);
   buildGamePool();
   renderDots();
-  setTimeout(()=>loadQuestion(),400);
+  setTimeout(()=>loadQuestion(), 500);
 }
 
-function resetTierPools(){
-  [1,2,3].forEach(t=>{
-    tierPools[t] = LOCS.filter(l=>l.tier===t).sort(()=>Math.random()-.5);
-  });
+/* ════════════════════════════════════════════
+   GAME TYPE SWITCH
+════════════════════════════════════════════ */
+function switchGameType(t){
+  if(gameType===t) return;
+  gameType = t;
+  clearTI();
+  hideResults();
+  // Update mode bar labels
+  updateModeLabels();
+  // Fly map
+  if(t==='us') map.flyTo([39.5,-98.35],4,{duration:1.2});
+  else map.flyTo([20,0],2,{duration:1.2});
+  // Update header stats
+  syncHeaderStats();
+  updateDiffUI(gs().gameDiff);
+  buildGamePool();
+  renderDots();
+  setTimeout(()=>loadQuestion(), 400);
 }
 
-function setMode(m,el){
-  gameMode=m;
+function updateModeLabels(){
+  const placeLabel = gameType==='us' ? 'States' : 'Countries';
+  document.getElementById('mb-place').textContent = placeLabel;
+  updateModeDesc();
+}
+
+function updateModeDesc(){
+  const descs = {
+    capital: 'Name the capital city',
+    place: gameType==='us' ? 'Name the state' : 'Name the country',
+    mixed: 'Capitals and ' + (gameType==='us' ? 'states' : 'countries'),
+  };
+  document.getElementById('mode-desc').textContent = descs[gameMode] || descs.capital;
+}
+
+function syncHeaderStats(){
+  const s = gs();
+  document.getElementById('sc').textContent = s.score;
+  document.getElementById('stk').textContent = s.streak;
+  document.getElementById('game-badge').textContent = 'Game ' + (s.gameNum||1);
+}
+
+/* ════════════════════════════════════════════
+   MODE
+════════════════════════════════════════════ */
+function setMode(m, el){
+  gameMode = m;
   document.querySelectorAll('.mbtn').forEach(b=>b.classList.remove('active'));
   el.classList.add('active');
-  const descs={capital:'Name the capital city',country:'Name the country',mixed:'Capitals and countries'};
-  document.getElementById('mode-desc').textContent=descs[m];
-  score=0;streak=0;gameNum=0;gameDiff=1;weakLocs=[];prevStats=null;
-  document.getElementById('sc').textContent='0';
-  document.getElementById('stk').textContent='0';
-  resetTierPools();
+  updateModeDesc();
   hideResults();
+  clearTI();
   buildGamePool();
   renderDots();
-  clearTI();
   loadQuestion();
 }
 
-/* ── POOL BUILDING ── */
+/* ════════════════════════════════════════════
+   POOL BUILDING
+════════════════════════════════════════════ */
+function resetTierPools(t){
+  const dataset = t==='us' ? US_LOCS : WORLD_LOCS;
+  [1,2,3].forEach(tier=>{
+    state[t].tierPools[tier] = dataset.filter(l=>l.tier===tier).sort(()=>Math.random()-.5);
+  });
+}
+
 function buildGamePool(){
-  gameNum++;
-  gameIdx=0; gameHistory=[];
-  document.getElementById('game-badge').textContent='Game '+gameNum;
-  updateDiffUI(gameDiff);
+  const s = gs();
+  s.gameNum++;
+  s.gameIdx = 0;
+  s.gameHistory = [];
+  document.getElementById('game-badge').textContent = 'Game ' + s.gameNum;
+  document.getElementById('sc').textContent = s.score;
+  document.getElementById('stk').textContent = s.streak;
+  document.getElementById('qnum').textContent = '1/'+GAME_LEN;
+  updateDiffUI(s.gameDiff);
 
-  // Determine how many retry slots
-  const retrySlots = Math.min(weakLocs.length, RETRY_MAX);
+  const retrySlots = Math.min(s.weakLocs.length, RETRY_MAX);
+  const retryLocs  = s.weakLocs.splice(0, retrySlots);
   const freshCount = GAME_LEN - retrySlots;
-  const retryLocs  = weakLocs.splice(0, retrySlots);
-
-  // Build fresh locs according to tier mix
-  const mix = TIER_MIX[gameDiff];
+  const mix = TIER_MIX[s.gameDiff];
   const freshLocs = [];
-  const remaining = freshCount;
   let assigned = 0;
+  const dataset = currentDataset();
 
-  mix.forEach((m,i)=>{
-    const isLast = i===mix.length-1;
-    const n = isLast ? (remaining - assigned) : m.count;
-    let pool = tierPools[m.tier];
+  mix.forEach((m, i)=>{
+    const isLast = i === mix.length-1;
+    const n = isLast ? (freshCount - assigned) : m.count;
+    let pool = s.tierPools[m.tier];
     if(pool.length < n){
-      // Refill tier pool if exhausted
-      tierPools[m.tier] = LOCS.filter(l=>l.tier===m.tier).sort(()=>Math.random()-.5);
-      pool = tierPools[m.tier];
+      s.tierPools[m.tier] = dataset.filter(l=>l.tier===m.tier).sort(()=>Math.random()-.5);
+      pool = s.tierPools[m.tier];
     }
-    freshLocs.push(...pool.splice(0,n));
+    freshLocs.push(...pool.splice(0, n));
     assigned += n;
   });
 
-  gamePool = [...retryLocs, ...freshLocs].sort(()=>Math.random()-.5);
+  s.gamePool = [...retryLocs, ...freshLocs].sort(()=>Math.random()-.5);
 }
 
 function updateDiffUI(d){
   const meta = DIFF_META[d];
-  // Banner
-  const pips = document.querySelectorAll('#diff-pips .pip');
-  pips.forEach((p,i)=>{
+  document.querySelectorAll('#diff-pips .pip').forEach((p,i)=>{
     p.className = 'pip' + (i < meta.pips ? ' on '+meta.cls : '');
   });
   document.getElementById('diff-name').textContent = meta.name;
   document.getElementById('diff-name').className = 'diff-name '+meta.cls;
 }
 
-/* ── QUESTION LOADING ── */
-let timeLeft = 30;
-
+/* ════════════════════════════════════════════
+   QUESTION
+════════════════════════════════════════════ */
 function loadQuestion(){
   answered=false; phase=1;
-  const loc = gamePool[gameIdx];
-  curLoc=loc;
-  qType = (gameMode==='mixed')?(Math.random()>.5?'capital':'country'):gameMode;
-  correctAnswer = qType==='capital' ? loc.capital : loc.name;
+  const s = gs();
+  curLoc = s.gamePool[s.gameIdx];
+  if(!curLoc) return; // safety
+  qType = (gameMode==='mixed') ? (Math.random()>.5?'capital':'place') : gameMode;
+  correctAnswer = qType==='capital' ? curLoc.capital : curLoc.name;
 
-  document.getElementById('qnum').textContent=(gameIdx+1)+'/'+GAME_LEN;
-  document.getElementById('prog-label').textContent=(gameIdx+1)+'/'+GAME_LEN;
-  document.getElementById('question-text').innerHTML =
-    qType==='capital'
-    ? `What is the capital city of <strong>${loc.name}</strong>?`
-    : `<strong>${loc.capital}</strong> is the capital of which country?`;
-  document.getElementById('region-tag').textContent = loc.region;
+  document.getElementById('qnum').textContent = (s.gameIdx+1)+'/'+GAME_LEN;
+  document.getElementById('prog-label').textContent = (s.gameIdx+1)+'/'+GAME_LEN;
+  document.getElementById('question-text').innerHTML = qType==='capital'
+    ? `What is the capital of <strong>${curLoc.name}</strong>?`
+    : `<strong>${curLoc.capital}</strong> is the capital of which ${placeName()}?`;
+  document.getElementById('region-tag').textContent = curLoc.region;
 
   renderDots();
   showPhase1();
-  flyTo(loc.lat,loc.lng);
+  flyTo(curLoc.lat, curLoc.lng);
 }
 
-let curLoc, qType, correctAnswer, answered=false, phase=1;
-
+/* ════════════════════════════════════════════
+   PHASE 1
+════════════════════════════════════════════ */
 function showPhase1(){
   setPill('p1','Phase 1 — Recall');
   document.getElementById('timer-wrap').style.display='block';
@@ -644,12 +842,12 @@ function showPhase1(){
   hideFB();
   const inp=document.getElementById('geo-input');
   inp.value=''; inp.className='geo-input'; inp.disabled=false;
-  setTimeout(()=>inp.focus(),80);
+  setTimeout(()=>inp.focus(), 80);
   timeLeft=30; updateTimerUI();
   timerInterval=setInterval(()=>{
     timeLeft--; updateTimerUI();
-    if(timeLeft<=0){clearTI();failPhase1('timeout');}
-  },1000);
+    if(timeLeft<=0){ clearTI(); failPhase1('timeout'); }
+  }, 1000);
 }
 
 function updateTimerUI(){
@@ -668,37 +866,39 @@ function submitFreeText(){
   const inp=document.getElementById('geo-input');
   const val=inp.value.trim();
   if(!val) return;
-  if(match(val,correctAnswer)){
+  if(match(val, correctAnswer)){
     clearTI(); answered=true;
     inp.className='geo-input correct-flash'; inp.disabled=true;
-    const pts=200+streak*15; score+=pts; streak++;
-    document.getElementById('sc').textContent=score;
-    document.getElementById('stk').textContent=streak;
-    gameHistory.push('p1c');
+    const s=gs();
+    const pts=200+s.streak*15; s.score+=pts; s.streak++;
+    document.getElementById('sc').textContent=s.score;
+    document.getElementById('stk').textContent=s.streak;
+    gs().gameHistory.push('p1c');
     renderDots(); setMarker('green');
-    showFB('ok',streak>1?`Excellent! 🔥 ${streak} streak`:'Correct!',
+    showFB('ok', s.streak>1?`Excellent! 🔥 ${s.streak} streak`:'Correct!',
       `+${pts} pts — unaided`,
-      `${curLoc.capital} is the capital of ${curLoc.name} (${curLoc.region}).`,'full');
+      `${curLoc.capital} is the capital of ${curLoc.name}.`,'full');
   } else {
     inp.className='geo-input wrong-flash';
-    setTimeout(()=>{inp.className='geo-input'; inp.value=''; inp.focus();},500);
+    setTimeout(()=>{ inp.className='geo-input'; inp.value=''; inp.focus(); }, 500);
   }
 }
 
 function failPhase1(reason){
   if(answered) return;
-  clearTI(); streak=0; document.getElementById('stk').textContent='0';
+  clearTI();
+  gs().streak=0; document.getElementById('stk').textContent='0';
   setPill('p2','Phase 2 — Choose');
   document.getElementById('timer-wrap').style.display='none';
   document.getElementById('input-area').style.display='none';
   const intro=document.getElementById('p2-intro');
   intro.style.display='block';
   intro.innerHTML=reason==='timeout'
-    ?`<strong>Time's up!</strong> All options are from the <strong>${curLoc.region}</strong> area:`
+    ?`<strong>Time's up!</strong> Options are from the <strong>${curLoc.region}</strong> area:`
     :`Choose carefully — all options are from the <strong>${curLoc.region}</strong> area:`;
 
   const field=qType==='capital'?'capital':'name';
-  const wrong=getDistractors(curLoc,field,2);
+  const wrong=getDistractors(curLoc, field, 2);
   const opts=[correctAnswer,...wrong].sort(()=>Math.random()-.5);
   const ca=document.getElementById('choices-area');
   ca.innerHTML=''; ca.style.display='flex';
@@ -711,84 +911,90 @@ function failPhase1(reason){
   });
 }
 
-function checkMC(selected,btn){
+function checkMC(selected, btn){
   if(answered) return;
   answered=true;
   document.querySelectorAll('.choice').forEach(b=>b.disabled=true);
-  if(match(selected,correctAnswer)){
+  if(match(selected, correctAnswer)){
     btn.classList.add('correct');
-    score+=80; document.getElementById('sc').textContent=score;
-    gameHistory.push('p2c');
+    gs().score+=80; document.getElementById('sc').textContent=gs().score;
+    gs().gameHistory.push('p2c');
     renderDots(); setMarker('green');
     showFB('ok','Correct!','+80 pts — with hints',
-      `${curLoc.capital} is the capital of ${curLoc.name} (${curLoc.region}).`,'half');
+      `${curLoc.capital} is the capital of ${curLoc.name}.`,'half');
   } else {
     btn.classList.add('wrong');
     document.querySelectorAll('.choice').forEach(b=>{
-      if(match(b.textContent.slice(1).trim(),correctAnswer)) b.classList.add('correct');
+      if(match(b.textContent.slice(1).trim(), correctAnswer)) b.classList.add('correct');
     });
-    gameHistory.push('miss');
+    gs().gameHistory.push('miss');
     renderDots(); setMarker('red');
     showFB('nope','Missed this one.',null,
-      `The answer is ${correctAnswer}. ${curLoc.capital} is the capital of ${curLoc.name} (${curLoc.region}).`,'zero');
+      `The answer is ${correctAnswer}. ${curLoc.capital} is the capital of ${curLoc.name}.`,'zero');
   }
 }
 
+/* ════════════════════════════════════════════
+   ADVANCE / END GAME
+════════════════════════════════════════════ */
 function advance(){
-  gameIdx++;
-  if(gameIdx>=GAME_LEN) endGame();
+  const s=gs();
+  s.gameIdx++;
+  if(s.gameIdx>=GAME_LEN) endGame();
   else loadQuestion();
 }
 
-/* ── END GAME ── */
 function endGame(){
   clearTI();
-  const p1c=gameHistory.filter(h=>h==='p1c').length;
-  const p2c=gameHistory.filter(h=>h==='p2c').length;
-  const miss=gameHistory.filter(h=>h==='miss').length;
-  const curStats={score,p1c,p2c,miss,diff:gameDiff};
+  const s=gs();
+  const p1c=s.gameHistory.filter(h=>h==='p1c').length;
+  const p2c=s.gameHistory.filter(h=>h==='p2c').length;
+  const miss=s.gameHistory.filter(h=>h==='miss').length;
+  const curStats={score:s.score,p1c,p2c,miss,diff:s.gameDiff};
 
-  // Collect weak locs for retry
   const missL=[], p2cL=[];
-  gameHistory.forEach((h,i)=>{
-    if(h==='miss') missL.push(gamePool[i]);
-    else if(h==='p2c') p2cL.push(gamePool[i]);
+  s.gameHistory.forEach((h,i)=>{
+    if(h==='miss') missL.push(s.gamePool[i]);
+    else if(h==='p2c') p2cL.push(s.gamePool[i]);
   });
-  weakLocs=[...missL,...p2cL];
+  s.weakLocs=[...missL,...p2cL];
 
-  // Adapt difficulty for NEXT game
-  const p1cRate = p1c/GAME_LEN;
-  const nextDiff = calcNextDiff(gameDiff, p1cRate);
-
-  renderResults(curStats,prevStats,nextDiff,p1cRate);
-  gameDiff = nextDiff;
-  prevStats = curStats;
+  const p1cRate=p1c/GAME_LEN;
+  const nextDiff=calcNextDiff(s.gameDiff, p1cRate);
+  renderResults(curStats, s.prevStats, s.gameHistory, s.gamePool);
+  s.gameDiff=nextDiff;
+  s.prevStats=curStats;
 }
 
 function calcNextDiff(current, p1cRate){
-  if(p1cRate >= UP_THRESHOLD && current < 3) return current+1;
-  if(p1cRate < DOWN_THRESHOLD && current > 1) return current-1;
+  if(p1cRate>=UP_THRESHOLD && current<3) return current+1;
+  if(p1cRate<DOWN_THRESHOLD && current>1) return current-1;
   return current;
 }
 
-function renderResults(cur, prev, nextDiff, p1cRate){
-  document.getElementById('res-game-num').textContent=`Game ${gameNum} Complete`;
+/* ════════════════════════════════════════════
+   RESULTS
+════════════════════════════════════════════ */
+function renderResults(cur, prev, history, pool){
+  const s=gs();
+  document.getElementById('res-game-num').textContent=`Game ${s.gameNum} Complete`;
   document.getElementById('res-score-val').textContent=cur.score;
-  document.getElementById('res-p1c').textContent=cur.p1c;
-  document.getElementById('res-p2c').textContent=cur.p2c;
-  document.getElementById('res-miss').textContent=cur.miss;
-  document.getElementById('next-game-num').textContent=gameNum+1;
+  document.getElementById('next-game-num').textContent=s.gameNum+1;
 
-  // Title
+  const accPct=Math.round(((cur.p1c+cur.p2c)/GAME_LEN)*100);
+  document.getElementById('res-acc-pct').textContent=accPct+'%';
+
   const pct1=(cur.p1c/GAME_LEN)*100;
   let title,sub;
-  if(pct1>=90){title='Outstanding!';sub='Near-perfect recall. You\'re a geography ace.';}
+  if(pct1>=90){title='Outstanding!';sub='Near-perfect recall — you\'re a geography ace.';}
   else if(pct1>=70){title='Great work!';sub='Strong performance — keep building on it.';}
-  else if(pct1>=50){title='Good effort!';sub='More than half unaided — that\'s solid progress.';}
-  else if(pct1>=30){title='Keep going!';sub='Every game builds your knowledge — don\'t stop.';}
-  else {title='Good start!';sub='Geography takes time — you\'ll improve fast.';}
+  else if(pct1>=50){title='Good effort!';sub='More than half unaided — solid progress.';}
+  else if(pct1>=30){title='Keep going!';sub='Every game builds your knowledge.';}
+  else{title='Good start!';sub='Geography takes time — you\'ll improve fast.';}
   document.getElementById('res-title').textContent=title;
   document.getElementById('res-subtitle').textContent=sub;
+  document.getElementById('res-acc-sub').textContent=
+    cur.p1c>0?`${cur.p1c} answered without any help`:'Keep practising — you\'ll get there!';
 
   // Score change
   const badge=document.getElementById('res-score-change');
@@ -797,24 +1003,41 @@ function renderResults(cur, prev, nextDiff, p1cRate){
     badge.className='res-score-change '+(diff>0?'up':diff<0?'down':'same');
     badge.textContent=(diff>0?'▲ +':'▼ ')+Math.abs(diff)+' vs last game';
     badge.style.display='';
-  } else {
-    badge.style.display='none';
-  }
+  } else { badge.style.display='none'; }
 
-  // Next game difficulty preview
-  const ndm=DIFF_META[nextDiff];
-  const rpips=document.querySelectorAll('#rnd-pips .rnd-pip');
-  rpips.forEach((p,i)=>{
-    p.className='rnd-pip '+(i<ndm.pips?'on '+ndm.cls:'off');
+  // Breakdown bar
+  const bar=document.getElementById('res-breakdown-bar');
+  bar.innerHTML='';
+  [{n:cur.p1c,cls:'green'},{n:cur.p2c,cls:'amber'},{n:cur.miss,cls:'red'}].forEach(seg=>{
+    if(seg.n>0){
+      const d=document.createElement('div');
+      d.className='bb-seg '+seg.cls;
+      d.style.width=((seg.n/GAME_LEN)*100)+'%';
+      bar.appendChild(d);
+    }
   });
-  document.getElementById('rnd-desc').textContent=ndm.name;
-  document.getElementById('rnd-desc').className='rnd-desc '+ndm.cls;
-  // Sub message depends on direction
-  let ndSub=ndm.sub;
-  if(nextDiff>cur.diff) ndSub='Great score! Stepping up the challenge.';
-  else if(nextDiff<cur.diff) ndSub='Let\'s consolidate — slightly easier questions ahead.';
-  else if(cur.diff===1&&p1cRate<UP_THRESHOLD) ndSub='Keep practicing — you\'ll unlock harder levels soon.';
-  document.getElementById('rnd-sub').textContent=ndSub;
+  document.getElementById('res-p1c-l').textContent=`${cur.p1c} unaided`;
+  document.getElementById('res-p2c-l').textContent=`${cur.p2c} with hints`;
+  document.getElementById('res-miss-l').textContent=`${cur.miss} missed`;
+
+  // Missed list
+  const ml=document.getElementById('missed-list');
+  ml.innerHTML='';
+  const reviewItems=[
+    ...history.map((h,i)=>({h,loc:pool[i]})).filter(x=>x.h==='miss'),
+    ...history.map((h,i)=>({h,loc:pool[i]})).filter(x=>x.h==='p2c'),
+  ];
+  if(reviewItems.length===0){
+    ml.innerHTML='<div class="no-missed">Perfect game — nothing to review! 🎉</div>';
+  } else {
+    reviewItems.forEach(({h,loc})=>{
+      const el=document.createElement('div');
+      el.className='missed-item';
+      el.innerHTML=`<div><div class="missed-country">${loc.name}</div><div class="missed-capital">${loc.capital}</div></div>
+        <div class="missed-tag ${h==='miss'?'miss':'hint'}">${h==='miss'?'Missed':'Needed hint'}</div>`;
+      ml.appendChild(el);
+    });
+  }
 
   // Compare bars
   if(prev){
@@ -836,8 +1059,8 @@ function setBar(key,prevPct,curPct){
   document.getElementById('cmp-'+key+'-cur-l').textContent=Math.round(curPct*100)+'%';
 }
 
-function showResults(){document.getElementById('results-overlay').classList.add('show');}
-function hideResults(){document.getElementById('results-overlay').classList.remove('show');}
+function showResults(){ document.getElementById('results-overlay').classList.add('show'); }
+function hideResults(){ document.getElementById('results-overlay').classList.remove('show'); }
 
 function startNextGame(){
   hideResults();
@@ -846,39 +1069,47 @@ function startNextGame(){
   loadQuestion();
 }
 
-/* ── DOTS ── */
+/* ════════════════════════════════════════════
+   PROGRESS DOTS
+════════════════════════════════════════════ */
 function renderDots(){
+  const s=gs();
   const wrap=document.getElementById('prog-dots');
   wrap.innerHTML='';
   for(let i=0;i<GAME_LEN;i++){
     const d=document.createElement('div');
-    if(i<gameHistory.length) d.className='pdot '+gameHistory[i];
-    else if(i===gameIdx) d.className='pdot cur';
+    if(i<s.gameHistory.length) d.className='pdot '+s.gameHistory[i];
+    else if(i===s.gameIdx) d.className='pdot cur';
     else d.className='pdot empty';
     wrap.appendChild(d);
   }
 }
 
-/* ── DISTRACTOR ENGINE ── */
-function getDistractors(loc,field,n){
-  // Prefer same tier first within region/adjacent for maximum difficulty
-  const same=LOCS.filter(l=>l.region===loc.region&&l[field]!==loc[field]);
-  const adj=(ADJ[loc.region]||[]).flatMap(r=>LOCS.filter(l=>l.region===r&&l[field]!==loc[field]));
-  const combined=[...same,...adj].sort(()=>Math.random()-.5);
+/* ════════════════════════════════════════════
+   SMART DISTRACTORS
+════════════════════════════════════════════ */
+function getDistractors(loc, field, n){
+  const dataset=currentDataset();
+  const adj=currentAdj();
+  const same=dataset.filter(l=>l.region===loc.region&&l[field]!==loc[field]);
+  const adjLocs=(adj[loc.region]||[]).flatMap(r=>dataset.filter(l=>l.region===r&&l[field]!==loc[field]));
+  const combined=[...same,...adjLocs].sort(()=>Math.random()-.5);
   const seen=new Set([loc[field]]);
   const out=[];
   for(const l of combined){
-    if(!seen.has(l[field])){seen.add(l[field]);out.push(l[field]);}
+    if(!seen.has(l[field])){ seen.add(l[field]); out.push(l[field]); }
     if(out.length>=n) break;
   }
   while(out.length<n){
-    const fb=LOCS.find(l=>!seen.has(l[field]));
-    if(fb){out.push(fb[field]);seen.add(fb[field]);}else break;
+    const fb=dataset.find(l=>!seen.has(l[field]));
+    if(fb){ out.push(fb[field]); seen.add(fb[field]); } else break;
   }
   return out.slice(0,n);
 }
 
-/* ── HELPERS ── */
+/* ════════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════════ */
 function match(a,b){
   const n=s=>s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9 ]/g,'').trim();
   const na=n(a),nb=n(b);
@@ -886,14 +1117,14 @@ function match(a,b){
 }
 
 function showFB(type,msg,pts,detail,ptsClass){
-  if(type==='ok'){document.getElementById('fb-ok').textContent=msg;document.getElementById('fb-ok').classList.add('show');}
-  else{document.getElementById('fb-nope').textContent=msg;document.getElementById('fb-nope').classList.add('show');}
+  if(type==='ok'){ document.getElementById('fb-ok').textContent=msg; document.getElementById('fb-ok').classList.add('show'); }
+  else{ document.getElementById('fb-nope').textContent=msg; document.getElementById('fb-nope').classList.add('show'); }
   const pe=document.getElementById('fb-pts');
-  if(pts){pe.textContent=pts;pe.className='fb-pts show '+ptsClass;}
+  if(pts){ pe.textContent=pts; pe.className='fb-pts show '+ptsClass; }
   document.getElementById('fb-detail').textContent=detail;
   document.getElementById('fb-detail').classList.add('show');
   const nb=document.getElementById('next-btn');
-  nb.textContent=gameIdx===GAME_LEN-1?'See results →':'Next question →';
+  nb.textContent=gs().gameIdx===GAME_LEN-1?'See results →':'Next question →';
   nb.classList.add('show');
 }
 
@@ -908,7 +1139,7 @@ function setPill(cls,label){
   document.getElementById('phase-label').textContent=label;
 }
 
-function clearTI(){if(timerInterval){clearInterval(timerInterval);timerInterval=null;}}
+function clearTI(){ if(timerInterval){ clearInterval(timerInterval); timerInterval=null; } }
 
 function flyTo(lat,lng){
   if(marker) map.removeLayer(marker);
@@ -917,7 +1148,7 @@ function flyTo(lat,lng){
     <style>@keyframes rpl{0%{box-shadow:0 0 0 0 rgba(201,146,74,.5)}100%{box-shadow:0 0 0 18px rgba(201,146,74,0)}}</style>`,
     iconSize:[16,16],iconAnchor:[8,8]});
   marker=L.marker([lat,lng],{icon}).addTo(map);
-  map.flyTo([lat,lng],4,{duration:1.3,easeLinearity:.25});
+  map.flyTo([lat,lng], currentZoom(), {duration:1.3,easeLinearity:.25});
 }
 
 function setMarker(color){
@@ -932,6 +1163,12 @@ document.addEventListener('keydown',e=>{
   if(e.key==='Enter'&&phase===1&&!answered) submitFreeText();
 });
 
+// Show selector as soon as HTML is parsed — do not wait for Leaflet/fonts to load
+document.addEventListener('DOMContentLoaded', ()=>{
+  document.getElementById('game-select').style.display='flex';
+});
+
+// Init the map once all resources (Leaflet) are fully loaded
 window.onload=initMap;
 </script>
 </body>
