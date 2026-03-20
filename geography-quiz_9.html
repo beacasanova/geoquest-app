@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GeoQuest</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0e14;--s1:#111720;--s2:#1a2232;--s3:#212d40;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --gold:#c9924a;--gold-l:#e8b470;--gold-dim:rgba(201,146,74,0.15);
+  --text:#dde4ed;--muted:#6b7a8d;--muted2:#8a99ae;
+  --green:#3dba6f;--green-dim:rgba(61,186,111,0.12);
+  --red:#e05555;--red-dim:rgba(224,85,85,0.12);
+  --blue:#4a90d9;--blue-dim:rgba(74,144,217,0.12);
+  --r:10px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden;font-size:15px}
+
+/* ── HEADER ── */
+header{display:flex;align-items:center;justify-content:space-between;padding:11px 20px;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0;z-index:1000;gap:12px}
+.logo{font-family:'Libre Baskerville',serif;font-size:19px;color:var(--gold);white-space:nowrap}
+.logo em{font-style:italic;color:var(--text);opacity:.7}
+
+/* Switch game button in header */
+.switch-btn{padding:5px 13px;border-radius:17px;border:1px solid var(--border2);background:transparent;color:var(--muted2);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;white-space:nowrap;flex-shrink:0}
+.switch-btn:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ── GAME SELECT SCREEN ── */
+#game-select{
+  position:fixed;inset:0;z-index:2000;
+  background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+}
+.gs-logo{font-family:'Libre Baskerville',serif;font-size:32px;color:var(--gold);margin-bottom:6px;letter-spacing:.5px}
+.gs-logo em{font-style:italic;color:var(--text);opacity:.7}
+.gs-tagline{font-size:14px;color:var(--muted2);margin-bottom:44px;text-align:center}
+.gs-cards{display:flex;gap:18px;flex-wrap:wrap;justify-content:center;padding:0 24px}
+.gs-cards{align-items:stretch}
+.gs-card{
+  width:200px;background:var(--s1);border:1px solid var(--border2);border-radius:16px;
+  padding:28px 20px 24px;display:flex;flex-direction:column;align-items:center;gap:10px;
+  cursor:pointer;transition:all .2s;text-align:center;
+}
+.gs-card .gs-btn{margin-top:auto}
+.gs-card:hover{border-color:var(--gold);background:var(--s2);transform:translateY(-3px)}
+.gs-card:active{transform:translateY(0)}
+.gs-icon{font-size:44px;line-height:1;margin-bottom:4px}
+.gs-title{font-family:'Libre Baskerville',serif;font-size:18px;font-weight:700;color:var(--text)}
+.gs-desc{font-size:12px;color:var(--muted2);line-height:1.5}
+.gs-btn{margin-top:8px;padding:9px 22px;border-radius:20px;border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;transition:all .15s}
+.gs-btn.world{background:var(--blue);color:#fff}
+.gs-btn.us{background:var(--gold);color:#0a0e14}
+.gs-card:hover .gs-btn.world{filter:brightness(1.15)}
+.gs-card:hover .gs-btn.us{background:var(--gold-l)}
+
+.hstats{display:flex;gap:14px;align-items:center}
+.hstat{text-align:center}
+.hstat-l{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:500}
+.hstat-v{font-size:17px;font-weight:600;color:var(--text);line-height:1.2;font-variant-numeric:tabular-nums}
+.hstat-v.g{color:var(--gold)}
+.hdiv{width:1px;height:24px;background:var(--border2)}
+.game-badge{padding:3px 10px;border-radius:20px;background:var(--gold-dim);border:1px solid rgba(201,146,74,.3);font-size:10px;font-weight:600;color:var(--gold);letter-spacing:.5px;white-space:nowrap}
+
+/* ── MODE BAR ── */
+.modebar{display:flex;gap:6px;padding:9px 20px;background:var(--s1);border-bottom:1px solid var(--border);flex-shrink:0;align-items:center}
+.mbtn{padding:5px 13px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--muted2);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s}
+.mbtn.active{border-color:var(--gold);color:var(--gold);background:var(--gold-dim)}
+.mbtn:hover:not(.active){color:var(--text)}
+.mode-desc{margin-left:auto;font-size:11px;color:var(--muted);font-style:italic}
+
+/* ── LAYOUT ── */
+.main{display:flex;flex:1;overflow:hidden;position:relative}
+#map{flex:1;z-index:1}
+.sidebar{width:360px;flex-shrink:0;background:var(--s1);border-left:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;position:relative}
+
+/* ── DIFFICULTY BANNER ── */
+.diff-banner{padding:7px 20px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+.diff-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.diff-pips{display:flex;gap:4px;align-items:center}
+.pip{width:18px;height:4px;border-radius:2px;background:var(--s3);transition:background .4s}
+.pip.on.d1{background:#3dba6f}.pip.on.d2{background:#c9924a}.pip.on.d3{background:#e05555}
+.diff-name{font-size:11px;font-weight:600;letter-spacing:.3px}
+.diff-name.d1{color:#3dba6f}.diff-name.d2{color:#c9924a}.diff-name.d3{color:#e05555}
+
+/* ── PROGRESS DOTS ── */
+.prog-bar-wrap{padding:9px 20px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;gap:10px}
+.prog-dots{display:flex;gap:5px;flex:1}
+.pdot{width:100%;height:6px;border-radius:3px;background:var(--s3);transition:background .4s}
+.pdot.p1c{background:var(--green)}.pdot.p2c{background:var(--gold)}.pdot.miss{background:var(--red)}
+.pdot.cur{background:var(--blue);animation:pdot-pulse 1s infinite alternate}
+@keyframes pdot-pulse{from{opacity:.5}to{opacity:1}}
+.prog-label{font-size:11px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+
+/* ── PHASE HEADER ── */
+.phase-header{padding:14px 20px 0;flex-shrink:0}
+.phase-pill{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;margin-bottom:10px;transition:all .3s}
+.phase-pill.p1{background:var(--blue-dim);color:var(--blue);border:1px solid rgba(74,144,217,.25)}
+.phase-pill.p2{background:var(--gold-dim);color:var(--gold);border:1px solid rgba(201,146,74,.25)}
+.phase-pill .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.question{font-family:'Libre Baskerville',serif;font-size:16px;line-height:1.55;color:var(--text);padding-bottom:4px}
+.question strong{color:var(--gold-l)}
+.region-tag{font-size:11px;color:var(--muted);padding-bottom:12px;display:flex;align-items:center;gap:5px}
+.region-tag::before{content:'';display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--muted);opacity:.4}
+
+/* ── TIMER ── */
+.timer-wrap{padding:0 20px 12px;flex-shrink:0}
+.timer-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.timer-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.timer-count{font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--text);transition:color .3s}
+.timer-count.warn{color:#e08c3d}.timer-count.danger{color:var(--red)}
+.timer-bar-bg{height:5px;background:var(--s3);border-radius:3px;overflow:hidden}
+.timer-bar-fill{height:100%;border-radius:3px;background:var(--blue);transition:width .1s linear,background .3s}
+.timer-bar-fill.warn{background:#e08c3d}.timer-bar-fill.danger{background:var(--red)}
+
+/* ── INPUT ── */
+.input-area{padding:0 20px 12px;flex-shrink:0}
+.input-row{display:flex;gap:8px}
+.geo-input{flex:1;padding:11px 14px;background:var(--s2);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;outline:none;transition:border-color .15s,background .15s}
+.geo-input::placeholder{color:var(--muted)}
+.geo-input:focus{border-color:var(--blue)}
+.geo-input.correct-flash{border-color:var(--green);background:var(--green-dim)}
+.geo-input.wrong-flash{border-color:var(--red);background:var(--red-dim)}
+.submit-btn{padding:11px 14px;background:var(--blue);color:#fff;border:none;border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:all .15s;white-space:nowrap}
+.submit-btn:hover{filter:brightness(1.1)}
+.skip-btn{width:100%;margin-top:8px;padding:9px;background:transparent;border:1px dashed var(--border2);border-radius:var(--r);color:var(--muted);font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;transition:all .15s}
+.skip-btn:hover{border-color:var(--gold);color:var(--gold)}
+
+/* ── CHOICES ── */
+.p2-intro{padding:0 20px 10px;flex-shrink:0;font-size:12px;color:var(--muted2);font-style:italic;line-height:1.5}
+.p2-intro strong{color:var(--gold);font-style:normal;font-weight:500}
+.choices-area{padding:0 20px;display:flex;flex-direction:column;gap:8px;flex-shrink:0}
+.choice{padding:12px 15px;background:var(--s2);border:1px solid var(--border2);border-radius:var(--r);cursor:pointer;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;display:flex;align-items:center;gap:12px;transition:all .15s;text-align:left;width:100%}
+.choice:hover:not(:disabled){border-color:var(--gold);background:var(--gold-dim);transform:translateX(3px)}
+.choice .ltr{width:24px;height:24px;border-radius:6px;background:var(--s3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--muted);flex-shrink:0;transition:all .15s}
+.choice.correct{border-color:var(--green);background:var(--green-dim)}
+.choice.correct .ltr{background:var(--green);color:#0a0e14}
+.choice.wrong{border-color:var(--red);background:var(--red-dim)}
+.choice.wrong .ltr{background:var(--red);color:#fff}
+.choice:disabled{cursor:not-allowed}
+
+/* ── FEEDBACK ── */
+.feedback-area{padding:12px 20px;border-top:1px solid var(--border);flex-shrink:0;display:flex;flex-direction:column;gap:7px}
+.fb-msg{font-size:14px;font-weight:600;display:none}
+.fb-msg.show{display:block}
+.fb-msg.ok{color:var(--green)}.fb-msg.nope{color:var(--red)}
+.fb-pts{font-size:12px;font-weight:500;display:none;padding:4px 10px;border-radius:6px;width:fit-content}
+.fb-pts.show{display:block}
+.fb-pts.full{background:var(--green-dim);color:var(--green)}
+.fb-pts.half{background:var(--gold-dim);color:var(--gold)}
+.fb-pts.zero{background:var(--red-dim);color:var(--red)}
+.fb-detail{font-size:12px;color:var(--muted2);line-height:1.55;display:none}
+.fb-detail.show{display:block}
+.next-btn{padding:13px 18px;background:var(--gold);color:#0a0e14;border:none;border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;display:none;transition:all .15s;width:100%;text-align:center}
+.next-btn:hover{background:var(--gold-l);transform:translateY(-1px)}
+.next-btn.show{display:block}
+
+/* ── RESULTS OVERLAY ── */
+#results-overlay{position:absolute;inset:0;z-index:200;background:var(--s1);display:none;flex-direction:column;overflow-y:auto}
+#results-overlay.show{display:flex}
+.res-top{padding:20px 22px 14px;border-bottom:1px solid var(--border);flex-shrink:0}
+.res-game-num{font-size:11px;text-transform:uppercase;letter-spacing:2px;color:var(--muted);margin-bottom:4px}
+.res-title{font-family:'Libre Baskerville',serif;font-size:22px;color:var(--gold);font-weight:700}
+.res-subtitle{font-size:13px;color:var(--muted2);margin-top:3px}
+.res-scorebox{margin:14px 22px 0;background:var(--s2);border-radius:var(--r);border:1px solid var(--border2);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-shrink:0}
+.res-score-main{display:flex;flex-direction:column}
+.res-score-val{font-size:34px;font-weight:700;color:var(--gold);line-height:1;font-variant-numeric:tabular-nums}
+.res-score-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:3px}
+.res-score-change{font-size:13px;font-weight:500;padding:4px 10px;border-radius:6px}
+.res-score-change.up{background:var(--green-dim);color:var(--green)}
+.res-score-change.down{background:var(--red-dim);color:var(--red)}
+.res-score-change.same{background:var(--s3);color:var(--muted2)}
+
+/* Accuracy */
+.res-accuracy{margin:12px 22px 0;flex-shrink:0}
+.acc-row{display:flex;align-items:center;gap:14px;margin-bottom:10px}
+.acc-pct{font-size:40px;font-weight:700;color:var(--gold);line-height:1;font-variant-numeric:tabular-nums}
+.acc-right{display:flex;flex-direction:column;gap:2px}
+.acc-label{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);font-weight:500}
+.acc-sub{font-size:12px;color:var(--muted2)}
+.breakdown-bar{height:10px;border-radius:5px;overflow:hidden;display:flex;gap:2px;margin-bottom:6px}
+.bb-seg{height:100%;border-radius:3px;transition:width .6s cubic-bezier(.4,0,.2,1);min-width:0}
+.bb-seg.green{background:var(--green)}.bb-seg.amber{background:var(--gold)}.bb-seg.red{background:var(--red)}
+.breakdown-legend{display:flex;gap:12px}
+.bl-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--muted2)}
+.bl-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* Missed list */
+.res-missed{padding:12px 22px 0;flex-shrink:0}
+.res-missed-title{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:8px;font-weight:500}
+.missed-list{display:flex;flex-direction:column;gap:6px}
+.missed-item{background:var(--s2);border:1px solid var(--border2);border-radius:8px;padding:9px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.missed-country{font-size:13px;font-weight:500;color:var(--text)}
+.missed-capital{font-size:12px;color:var(--muted2)}
+.missed-tag{font-size:10px;padding:2px 7px;border-radius:10px;white-space:nowrap;flex-shrink:0}
+.missed-tag.miss{background:var(--red-dim);color:var(--red)}
+.missed-tag.hint{background:var(--gold-dim);color:var(--gold)}
+.no-missed{font-size:13px;color:var(--green);font-style:italic}
+
+/* Compare bars */
+.res-compare{padding:12px 22px 0;flex-shrink:0}
+.res-compare-title{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted);margin-bottom:10px;font-weight:500}
+.compare-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.compare-label{font-size:12px;color:var(--muted2);width:70px;flex-shrink:0}
+.compare-bars{flex:1;display:flex;flex-direction:column;gap:4px}
+.bar-row{display:flex;align-items:center;gap:6px}
+.bar-track{flex:1;height:6px;background:var(--s3);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;transition:width .6s cubic-bezier(.4,0,.2,1)}
+.bar-fill.green{background:var(--green)}.bar-fill.amber{background:var(--gold)}.bar-fill.red{background:var(--red)}
+.bar-pct{font-size:10px;color:var(--muted2);width:28px;text-align:right;font-variant-numeric:tabular-nums}
+.compare-legend{display:flex;gap:12px;margin-top:6px}
+.leg-item{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted)}
+.leg-pip{width:10px;height:4px;border-radius:2px}
+
+.res-cta{padding:16px 22px;flex-shrink:0;margin-top:auto;border-top:1px solid var(--border)}
+.play-again-btn{width:100%;padding:14px;background:var(--gold);color:#0a0e14;border:none;border-radius:var(--r);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .15s}
+.play-again-btn:hover{background:var(--gold-l);transform:translateY(-1px)}
+
+.leaflet-container{background:#0a1520}
+</style>
+</head>
+<body>
+
+<!-- GAME SELECTION SCREEN -->
+<div id="game-select">
+  <div class="gs-logo">Geo<em>Quest</em></div>
+  <div class="gs-tagline">Choose your challenge to get started</div>
+  <div class="gs-cards">
+    <div class="gs-card" onclick="selectGame('world')">
+      <div class="gs-icon">🌍</div>
+      <div class="gs-title">World</div>
+      <div class="gs-desc">Capitals &amp; countries from every continent. Adaptive difficulty from easy to expert.</div>
+      <button class="gs-btn world">Play World</button>
+    </div>
+    <div class="gs-card" onclick="selectGame('us')">
+      <div class="gs-icon">🇺🇸</div>
+      <div class="gs-title">USA</div>
+      <div class="gs-desc">All 50 US state capitals — from obvious to the ones that always trip you up.</div>
+      <button class="gs-btn us">Play USA</button>
+    </div>
+  </div>
+</div>
+
+<header>
+  <div class="logo">Geo<em>Quest</em></div>
+  <button class="switch-btn" onclick="showGameSelect()">⇄ Switch game</button>
+  <div class="hstats">
+    <div class="hstat"><div class="hstat-l">Score</div><div class="hstat-v g" id="sc">0</div></div>
+    <div class="hdiv"></div>
+    <div class="hstat"><div class="hstat-l">Q</div><div class="hstat-v" id="qnum">1/10</div></div>
+    <div class="hdiv"></div>
+    <div class="hstat"><div class="hstat-l">Streak</div><div class="hstat-v" id="stk">0</div></div>
+    <div class="hdiv"></div>
+    <div class="game-badge" id="game-badge">Game 1</div>
+  </div>
+</header>
+
+<div class="modebar">
+  <button class="mbtn active" id="mb-capital" onclick="setMode('capital',this)">Capitals</button>
+  <button class="mbtn" id="mb-place" onclick="setMode('place',this)">Countries</button>
+  <button class="mbtn" onclick="setMode('mixed',this)">Mixed</button>
+  <span class="mode-desc" id="mode-desc">Name the capital city</span>
+</div>
+
+<div class="main">
+  <div id="map"></div>
+  <div class="sidebar">
+
+    <div class="diff-banner">
+      <div class="diff-label">Difficulty</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="diff-pips" id="diff-pips">
+          <div class="pip"></div><div class="pip"></div><div class="pip"></div>
+        </div>
+        <div class="diff-name" id="diff-name">Starter</div>
+      </div>
+    </div>
+
+    <div class="prog-bar-wrap">
+      <div class="prog-dots" id="prog-dots"></div>
+      <div class="prog-label" id="prog-label">1 / 10</div>
+    </div>
+
+    <div class="phase-header">
+      <div class="phase-pill p1" id="phase-pill">
+        <div class="dot"></div><span id="phase-label">Phase 1 — Recall</span>
+      </div>
+      <div class="question" id="question-text"></div>
+      <div class="region-tag" id="region-tag"></div>
+    </div>
+
+    <div class="timer-wrap" id="timer-wrap">
+      <div class="timer-top">
+        <div class="timer-label">Time remaining</div>
+        <div class="timer-count" id="timer-num">30s</div>
+      </div>
+      <div class="timer-bar-bg"><div class="timer-bar-fill" id="timer-bar" style="width:100%"></div></div>
+    </div>
+
+    <div class="input-area" id="input-area">
+      <div class="input-row">
+        <input class="geo-input" id="geo-input" type="text" placeholder="Type your answer…" autocomplete="off" autocorrect="off" spellcheck="false"/>
+        <button class="submit-btn" onclick="submitFreeText()">Check</button>
+      </div>
+      <button class="skip-btn" onclick="failPhase1('skipped')">I'm not sure — show me options →</button>
+    </div>
+
+    <div class="p2-intro" id="p2-intro" style="display:none"></div>
+    <div class="choices-area" id="choices-area" style="display:none"></div>
+
+    <div class="feedback-area">
+      <div class="fb-msg ok" id="fb-ok"></div>
+      <div class="fb-msg nope" id="fb-nope"></div>
+      <div class="fb-pts" id="fb-pts"></div>
+      <div class="fb-detail" id="fb-detail"></div>
+      <button class="next-btn" id="next-btn" onclick="advance()">Next question →</button>
+    </div>
+
+    <!-- RESULTS OVERLAY -->
+    <div id="results-overlay">
+      <div class="res-top">
+        <div class="res-game-num" id="res-game-num">Game 1 Complete</div>
+        <div class="res-title" id="res-title">Good start!</div>
+        <div class="res-subtitle" id="res-subtitle">Here's how you did</div>
+      </div>
+
+      <div class="res-scorebox">
+        <div class="res-score-main">
+          <div class="res-score-val" id="res-score-val">0</div>
+          <div class="res-score-label">Total Score</div>
+        </div>
+        <div class="res-score-change" id="res-score-change" style="display:none"></div>
+      </div>
+
+      <div class="res-accuracy">
+        <div class="acc-row">
+          <div class="acc-pct" id="res-acc-pct">0%</div>
+          <div class="acc-right">
+            <div class="acc-label">Accuracy</div>
+            <div class="acc-sub" id="res-acc-sub"></div>
+          </div>
+        </div>
+        <div class="breakdown-bar" id="res-breakdown-bar"></div>
+        <div class="breakdown-legend">
+          <div class="bl-item"><div class="bl-dot" style="background:var(--green)"></div><span id="res-p1c-l">0 unaided</span></div>
+          <div class="bl-item"><div class="bl-dot" style="background:var(--gold)"></div><span id="res-p2c-l">0 with hints</span></div>
+          <div class="bl-item"><div class="bl-dot" style="background:var(--red)"></div><span id="res-miss-l">0 missed</span></div>
+        </div>
+      </div>
+
+      <div class="res-missed">
+        <div class="res-missed-title">To review</div>
+        <div class="missed-list" id="missed-list"></div>
+      </div>
+
+      <div class="res-compare" id="res-compare" style="display:none">
+        <div class="res-compare-title">Progress vs last game</div>
+        <div class="compare-row">
+          <div class="compare-label">Unaided</div>
+          <div class="compare-bars">
+            <div class="bar-row"><div class="bar-track"><div class="bar-fill green" id="cmp-p1c-prev" style="width:0%"></div></div><div class="bar-pct" id="cmp-p1c-prev-l">0%</div></div>
+            <div class="bar-row"><div class="bar-track"><div class="bar-fill green" id="cmp-p1c-cur" style="width:0%;opacity:.45"></div></div><div class="bar-pct" id="cmp-p1c-cur-l">0%</div></div>
+          </div>
+        </div>
+        <div class="compare-row">
+          <div class="compare-label">With hints</div>
+          <div class="compare-bars">
+            <div class="bar-row"><div class="bar-track"><div class="bar-fill amber" id="cmp-p2c-prev" style="width:0%"></div></div><div class="bar-pct" id="cmp-p2c-prev-l">0%</div></div>
+            <div class="bar-row"><div class="bar-track"><div class="bar-fill amber" id="cmp-p2c-cur" style="width:0%;opacity:.45"></div></div><div class="bar-pct" id="cmp-p2c-cur-l">0%</div></div>
+          </div>
+        </div>
+        <div class="compare-row">
+          <div class="compare-label">Missed</div>
+          <div class="compare-bars">
+            <div class="bar-row"><div class="bar-track"><div class="bar-fill red" id="cmp-miss-prev" style="width:0%"></div></div><div class="bar-pct" id="cmp-miss-prev-l">0%</div></div>
+            <div class="bar-row"><div class="bar-track"><div class="bar-fill red" id="cmp-miss-cur" style="width:0%;opacity:.45"></div></div><div class="bar-pct" id="cmp-miss-cur-l">0%</div></div>
+          </div>
+        </div>
+        <div class="compare-legend">
+          <div class="leg-item"><div class="leg-pip" style="background:var(--muted2)"></div>Last game</div>
+          <div class="leg-item"><div class="leg-pip" style="background:var(--muted2);opacity:.45"></div>This game</div>
+        </div>
+      </div>
+
+      <div class="res-cta">
+        <button class="play-again-btn" onclick="startNextGame()">Play Game <span id="next-game-num">2</span> →</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ════════════════════════════════════════════
+   WORLD DATA
+════════════════════════════════════════════ */
+const WORLD_LOCS = [
+  // Tier 1
+  {name:"France",capital:"Paris",lat:48.8566,lng:2.3522,region:"Western Europe",tier:1},
+  {name:"Germany",capital:"Berlin",lat:52.5200,lng:13.4050,region:"Central Europe",tier:1},
+  {name:"Italy",capital:"Rome",lat:41.9028,lng:12.4964,region:"Southern Europe",tier:1},
+  {name:"Spain",capital:"Madrid",lat:40.4168,lng:-3.7038,region:"Western Europe",tier:1},
+  {name:"United Kingdom",capital:"London",lat:51.5074,lng:-0.1278,region:"Western Europe",tier:1},
+  {name:"Japan",capital:"Tokyo",lat:35.6762,lng:139.6503,region:"East Asia",tier:1},
+  {name:"China",capital:"Beijing",lat:39.9042,lng:116.4074,region:"East Asia",tier:1},
+  {name:"Australia",capital:"Canberra",lat:-35.2809,lng:149.1300,region:"Oceania",tier:1},
+  {name:"Brazil",capital:"Brasília",lat:-15.7801,lng:-47.9292,region:"South America",tier:1},
+  {name:"Mexico",capital:"Mexico City",lat:19.4326,lng:-99.1332,region:"Central America",tier:1},
+  {name:"Canada",capital:"Ottawa",lat:45.4215,lng:-75.6972,region:"North America",tier:1},
+  {name:"Russia",capital:"Moscow",lat:55.7558,lng:37.6173,region:"Eastern Europe",tier:1},
+  {name:"India",capital:"New Delhi",lat:28.6139,lng:77.2090,region:"South Asia",tier:1},
+  {name:"South Korea",capital:"Seoul",lat:37.5665,lng:126.9780,region:"East Asia",tier:1},
+  {name:"Argentina",capital:"Buenos Aires",lat:-34.6037,lng:-58.3816,region:"South America",tier:1},
+  {name:"Greece",capital:"Athens",lat:37.9838,lng:23.7275,region:"Southern Europe",tier:1},
+  {name:"Egypt",capital:"Cairo",lat:30.0444,lng:31.2357,region:"North Africa",tier:1},
+  {name:"South Africa",capital:"Pretoria",lat:-25.7461,lng:28.1881,region:"Southern Africa",tier:1},
+  {name:"Turkey",capital:"Ankara",lat:39.9334,lng:32.8597,region:"Middle East",tier:1},
+  {name:"Thailand",capital:"Bangkok",lat:13.7563,lng:100.5018,region:"Southeast Asia",tier:1},
+  {name:"Sweden",capital:"Stockholm",lat:59.3293,lng:18.0686,region:"Northern Europe",tier:1},
+  {name:"Netherlands",capital:"Amsterdam",lat:52.3676,lng:4.9041,region:"Western Europe",tier:1},
+  {name:"Portugal",capital:"Lisbon",lat:38.7169,lng:-9.1395,region:"Western Europe",tier:1},
+  {name:"Norway",capital:"Oslo",lat:59.9139,lng:10.7522,region:"Northern Europe",tier:1},
+  {name:"Cuba",capital:"Havana",lat:23.1136,lng:-82.3666,region:"Caribbean",tier:1},
+  {name:"Saudi Arabia",capital:"Riyadh",lat:24.7136,lng:46.6753,region:"Middle East",tier:1},
+  {name:"Kenya",capital:"Nairobi",lat:-1.2921,lng:36.8219,region:"East Africa",tier:1},
+  {name:"Nigeria",capital:"Abuja",lat:9.0765,lng:7.3986,region:"West Africa",tier:1},
+  {name:"Indonesia",capital:"Jakarta",lat:-6.2088,lng:106.8456,region:"Southeast Asia",tier:1},
+  // Tier 2
+  {name:"Poland",capital:"Warsaw",lat:52.2297,lng:21.0122,region:"Central Europe",tier:2},
+  {name:"Austria",capital:"Vienna",lat:48.2082,lng:16.3738,region:"Central Europe",tier:2},
+  {name:"Switzerland",capital:"Bern",lat:46.9481,lng:7.4474,region:"Central Europe",tier:2},
+  {name:"Belgium",capital:"Brussels",lat:50.8503,lng:4.3517,region:"Western Europe",tier:2},
+  {name:"Denmark",capital:"Copenhagen",lat:55.6761,lng:12.5683,region:"Northern Europe",tier:2},
+  {name:"Finland",capital:"Helsinki",lat:60.1699,lng:24.9384,region:"Northern Europe",tier:2},
+  {name:"Ireland",capital:"Dublin",lat:53.3498,lng:-6.2603,region:"Western Europe",tier:2},
+  {name:"Czech Republic",capital:"Prague",lat:50.0755,lng:14.4378,region:"Central Europe",tier:2},
+  {name:"Hungary",capital:"Budapest",lat:47.4979,lng:19.0402,region:"Central Europe",tier:2},
+  {name:"Romania",capital:"Bucharest",lat:44.4268,lng:26.1025,region:"Eastern Europe",tier:2},
+  {name:"Ukraine",capital:"Kyiv",lat:50.4501,lng:30.5234,region:"Eastern Europe",tier:2},
+  {name:"Colombia",capital:"Bogotá",lat:4.7110,lng:-74.0721,region:"South America",tier:2},
+  {name:"Chile",capital:"Santiago",lat:-33.4489,lng:-70.6693,region:"South America",tier:2},
+  {name:"Peru",capital:"Lima",lat:-12.0464,lng:-77.0428,region:"South America",tier:2},
+  {name:"Vietnam",capital:"Hanoi",lat:21.0285,lng:105.8542,region:"Southeast Asia",tier:2},
+  {name:"Philippines",capital:"Manila",lat:14.5995,lng:120.9842,region:"Southeast Asia",tier:2},
+  {name:"Malaysia",capital:"Kuala Lumpur",lat:3.1390,lng:101.6869,region:"Southeast Asia",tier:2},
+  {name:"Pakistan",capital:"Islamabad",lat:33.6844,lng:73.0479,region:"South Asia",tier:2},
+  {name:"Bangladesh",capital:"Dhaka",lat:23.8103,lng:90.4125,region:"South Asia",tier:2},
+  {name:"Iran",capital:"Tehran",lat:35.6892,lng:51.3890,region:"Middle East",tier:2},
+  {name:"Iraq",capital:"Baghdad",lat:33.3152,lng:44.3661,region:"Middle East",tier:2},
+  {name:"Israel",capital:"Jerusalem",lat:31.7683,lng:35.2137,region:"Middle East",tier:2},
+  {name:"Jordan",capital:"Amman",lat:31.9539,lng:35.9106,region:"Middle East",tier:2},
+  {name:"Morocco",capital:"Rabat",lat:34.0209,lng:-6.8416,region:"North Africa",tier:2},
+  {name:"Ethiopia",capital:"Addis Ababa",lat:9.0320,lng:38.7469,region:"East Africa",tier:2},
+  {name:"Ghana",capital:"Accra",lat:5.6037,lng:-0.1870,region:"West Africa",tier:2},
+  {name:"New Zealand",capital:"Wellington",lat:-41.2866,lng:174.7756,region:"Oceania",tier:2},
+  {name:"Venezuela",capital:"Caracas",lat:10.4806,lng:-66.9036,region:"South America",tier:2},
+  {name:"North Korea",capital:"Pyongyang",lat:39.0392,lng:125.7625,region:"East Asia",tier:2},
+  {name:"Mongolia",capital:"Ulaanbaatar",lat:47.8864,lng:106.9057,region:"East Asia",tier:2},
+  {name:"Serbia",capital:"Belgrade",lat:44.7866,lng:20.4489,region:"Southern Europe",tier:2},
+  {name:"Croatia",capital:"Zagreb",lat:45.8150,lng:15.9819,region:"Southern Europe",tier:2},
+  {name:"Iceland",capital:"Reykjavik",lat:64.1265,lng:-21.8174,region:"Northern Europe",tier:2},
+  {name:"Singapore",capital:"Singapore",lat:1.3521,lng:103.8198,region:"Southeast Asia",tier:2},
+  {name:"Myanmar",capital:"Naypyidaw",lat:19.7633,lng:96.0785,region:"Southeast Asia",tier:2},
+  {name:"Afghanistan",capital:"Kabul",lat:34.5553,lng:69.2075,region:"South Asia",tier:2},
+  {name:"Nepal",capital:"Kathmandu",lat:27.7172,lng:85.3240,region:"South Asia",tier:2},
+  {name:"Lebanon",capital:"Beirut",lat:33.8886,lng:35.4955,region:"Middle East",tier:2},
+  {name:"Algeria",capital:"Algiers",lat:36.7372,lng:3.0865,region:"North Africa",tier:2},
+  // Tier 3
+  {name:"Slovakia",capital:"Bratislava",lat:48.1486,lng:17.1077,region:"Central Europe",tier:3},
+  {name:"Luxembourg",capital:"Luxembourg City",lat:49.6116,lng:6.1319,region:"Western Europe",tier:3},
+  {name:"Slovenia",capital:"Ljubljana",lat:46.0569,lng:14.5058,region:"Southern Europe",tier:3},
+  {name:"Albania",capital:"Tirana",lat:41.3275,lng:19.8187,region:"Southern Europe",tier:3},
+  {name:"Bulgaria",capital:"Sofia",lat:42.6977,lng:23.3219,region:"Eastern Europe",tier:3},
+  {name:"Belarus",capital:"Minsk",lat:53.9045,lng:27.5615,region:"Eastern Europe",tier:3},
+  {name:"Moldova",capital:"Chișinău",lat:47.0105,lng:28.8638,region:"Eastern Europe",tier:3},
+  {name:"Estonia",capital:"Tallinn",lat:59.4370,lng:24.7536,region:"Northern Europe",tier:3},
+  {name:"Latvia",capital:"Riga",lat:56.9460,lng:24.1059,region:"Northern Europe",tier:3},
+  {name:"Lithuania",capital:"Vilnius",lat:54.6872,lng:25.2797,region:"Northern Europe",tier:3},
+  {name:"Kazakhstan",capital:"Astana",lat:51.1801,lng:71.4460,region:"Central Asia",tier:3},
+  {name:"Uzbekistan",capital:"Tashkent",lat:41.2995,lng:69.2401,region:"Central Asia",tier:3},
+  {name:"Turkmenistan",capital:"Ashgabat",lat:37.9601,lng:58.3261,region:"Central Asia",tier:3},
+  {name:"Kyrgyzstan",capital:"Bishkek",lat:42.8746,lng:74.5698,region:"Central Asia",tier:3},
+  {name:"Tajikistan",capital:"Dushanbe",lat:38.5598,lng:68.7738,region:"Central Asia",tier:3},
+  {name:"Syria",capital:"Damascus",lat:33.5138,lng:36.2765,region:"Middle East",tier:3},
+  {name:"Yemen",capital:"Sana'a",lat:15.3694,lng:44.1910,region:"Middle East",tier:3},
+  {name:"Oman",capital:"Muscat",lat:23.5880,lng:58.3829,region:"Middle East",tier:3},
+  {name:"Kuwait",capital:"Kuwait City",lat:29.3797,lng:47.9734,region:"Middle East",tier:3},
+  {name:"Qatar",capital:"Doha",lat:25.2854,lng:51.5310,region:"Middle East",tier:3},
+  {name:"Libya",capital:"Tripoli",lat:32.8872,lng:13.1913,region:"North Africa",tier:3},
+  {name:"Tunisia",capital:"Tunis",lat:36.8190,lng:10.1658,region:"North Africa",tier:3},
+  {name:"Sudan",capital:"Khartoum",lat:15.5007,lng:32.5599,region:"North Africa",tier:3},
+  {name:"Senegal",capital:"Dakar",lat:14.7167,lng:-17.4677,region:"West Africa",tier:3},
+  {name:"Côte d'Ivoire",capital:"Yamoussoukro",lat:6.8276,lng:-5.2893,region:"West Africa",tier:3},
+  {name:"Mali",capital:"Bamako",lat:12.6392,lng:-8.0029,region:"West Africa",tier:3},
+  {name:"Niger",capital:"Niamey",lat:13.5116,lng:2.1254,region:"West Africa",tier:3},
+  {name:"Tanzania",capital:"Dodoma",lat:-6.1630,lng:35.7516,region:"East Africa",tier:3},
+  {name:"Uganda",capital:"Kampala",lat:0.3136,lng:32.5811,region:"East Africa",tier:3},
+  {name:"Rwanda",capital:"Kigali",lat:-1.9441,lng:30.0619,region:"East Africa",tier:3},
+  {name:"Madagascar",capital:"Antananarivo",lat:-18.9137,lng:47.5361,region:"East Africa",tier:3},
+  {name:"Zimbabwe",capital:"Harare",lat:-17.8252,lng:31.0335,region:"Southern Africa",tier:3},
+  {name:"Zambia",capital:"Lusaka",lat:-15.4166,lng:28.2833,region:"Southern Africa",tier:3},
+  {name:"Mozambique",capital:"Maputo",lat:-25.9692,lng:32.5732,region:"Southern Africa",tier:3},
+  {name:"Angola",capital:"Luanda",lat:-8.8390,lng:13.2894,region:"Southern Africa",tier:3},
+  {name:"Botswana",capital:"Gaborone",lat:-24.6282,lng:25.9231,region:"Southern Africa",tier:3},
+  {name:"Namibia",capital:"Windhoek",lat:-22.5597,lng:17.0832,region:"Southern Africa",tier:3},
+  {name:"DR Congo",capital:"Kinshasa",lat:-4.3217,lng:15.3222,region:"Central Africa",tier:3},
+  {name:"Cameroon",capital:"Yaoundé",lat:3.8480,lng:11.5021,region:"Central Africa",tier:3},
+  {name:"Ecuador",capital:"Quito",lat:-0.1807,lng:-78.4678,region:"South America",tier:3},
+  {name:"Bolivia",capital:"Sucre",lat:-19.0196,lng:-65.2619,region:"South America",tier:3},
+  {name:"Paraguay",capital:"Asunción",lat:-25.2867,lng:-57.6470,region:"South America",tier:3},
+  {name:"Uruguay",capital:"Montevideo",lat:-34.9011,lng:-56.1645,region:"South America",tier:3},
+  {name:"Guatemala",capital:"Guatemala City",lat:14.6349,lng:-90.5069,region:"Central America",tier:3},
+  {name:"Honduras",capital:"Tegucigalpa",lat:14.0818,lng:-87.2068,region:"Central America",tier:3},
+  {name:"Haiti",capital:"Port-au-Prince",lat:18.5944,lng:-72.3074,region:"Caribbean",tier:3},
+  {name:"Dominican Republic",capital:"Santo Domingo",lat:18.4861,lng:-69.9312,region:"Caribbean",tier:3},
+  {name:"Cambodia",capital:"Phnom Penh",lat:11.5564,lng:104.9282,region:"Southeast Asia",tier:3},
+  {name:"Laos",capital:"Vientiane",lat:17.9757,lng:102.6331,region:"Southeast Asia",tier:3},
+  {name:"Sri Lanka",capital:"Sri Jayawardenepura Kotte",lat:6.9271,lng:79.8612,region:"South Asia",tier:3},
+  {name:"Papua New Guinea",capital:"Port Moresby",lat:-9.4438,lng:147.1803,region:"Oceania",tier:3},
+  {name:"Taiwan",capital:"Taipei",lat:25.0329,lng:121.5654,region:"East Asia",tier:3},
+];
+
+const WORLD_ADJ = {
+  "Western Europe":["Central Europe","Southern Europe","Northern Europe"],
+  "Central Europe":["Western Europe","Eastern Europe","Southern Europe","Northern Europe"],
+  "Southern Europe":["Western Europe","Central Europe","Eastern Europe","North Africa","Middle East"],
+  "Eastern Europe":["Central Europe","Northern Europe","Southern Europe","Middle East","Central Asia"],
+  "Northern Europe":["Western Europe","Central Europe","Eastern Europe"],
+  "North Africa":["West Africa","East Africa","Southern Europe","Middle East"],
+  "West Africa":["North Africa","Central Africa","East Africa"],
+  "East Africa":["North Africa","West Africa","Central Africa","Southern Africa"],
+  "Southern Africa":["East Africa","Central Africa"],
+  "Central Africa":["West Africa","East Africa","Southern Africa"],
+  "South Asia":["East Asia","Southeast Asia","Central Asia","Middle East"],
+  "East Asia":["South Asia","Southeast Asia","Central Asia"],
+  "Southeast Asia":["East Asia","South Asia","Oceania"],
+  "Middle East":["South Asia","Central Asia","Eastern Europe","North Africa","Southern Europe"],
+  "Central Asia":["Middle East","South Asia","East Asia","Eastern Europe"],
+  "South America":["Central America","Caribbean"],
+  "Central America":["South America","Caribbean","North America"],
+  "Caribbean":["Central America","North America","South America"],
+  "North America":["Central America","Caribbean"],
+  "Oceania":["Southeast Asia","East Asia"],
+};
+
+/* ════════════════════════════════════════════
+   US STATES DATA
+   name = state, capital = capital city
+   region = US geographic region for smart distractors
+   Tier 1 = capital IS the major/obvious city
+   Tier 2 = capital is different from most-famous city (tricky!)
+   Tier 3 = obscure capitals most people don't know
+════════════════════════════════════════════ */
+const US_LOCS = [
+  // Tier 1 — capital is well-known / obvious
+  {name:"Alaska",capital:"Juneau",lat:58.3005,lng:-134.4197,region:"West",tier:2},
+  {name:"Arizona",capital:"Phoenix",lat:33.4484,lng:-112.0740,region:"Southwest",tier:1},
+  {name:"Colorado",capital:"Denver",lat:39.7392,lng:-104.9903,region:"West",tier:1},
+  {name:"Georgia",capital:"Atlanta",lat:33.7490,lng:-84.3880,region:"Southeast",tier:1},
+  {name:"Hawaii",capital:"Honolulu",lat:21.3069,lng:-157.8583,region:"Pacific",tier:1},
+  {name:"Idaho",capital:"Boise",lat:43.6150,lng:-116.2023,region:"West",tier:1},
+  {name:"Indiana",capital:"Indianapolis",lat:39.7684,lng:-86.1581,region:"Midwest",tier:1},
+  {name:"Massachusetts",capital:"Boston",lat:42.3601,lng:-71.0589,region:"Northeast",tier:1},
+  {name:"Nevada",capital:"Carson City",lat:39.1638,lng:-119.7674,region:"West",tier:2},
+  {name:"New Mexico",capital:"Santa Fe",lat:35.6870,lng:-105.9378,region:"Southwest",tier:1},
+  {name:"Ohio",capital:"Columbus",lat:39.9612,lng:-82.9988,region:"Midwest",tier:1},
+  {name:"Oklahoma",capital:"Oklahoma City",lat:35.4676,lng:-97.5164,region:"Southwest",tier:1},
+  {name:"Tennessee",capital:"Nashville",lat:36.1627,lng:-86.7816,region:"Southeast",tier:1},
+  {name:"Texas",capital:"Austin",lat:30.2672,lng:-97.7431,region:"Southwest",tier:1},
+  {name:"Utah",capital:"Salt Lake City",lat:40.7608,lng:-111.8910,region:"West",tier:1},
+  {name:"Virginia",capital:"Richmond",lat:37.5407,lng:-77.4360,region:"Southeast",tier:2},
+  // Tier 2 — tricky: capital ≠ most famous city
+  {name:"Alabama",capital:"Montgomery",lat:32.3792,lng:-86.3077,region:"Southeast",tier:2},
+  {name:"California",capital:"Sacramento",lat:38.5816,lng:-121.4944,region:"West",tier:2},
+  {name:"Connecticut",capital:"Hartford",lat:41.7658,lng:-72.6851,region:"Northeast",tier:2},
+  {name:"Delaware",capital:"Dover",lat:39.1582,lng:-75.5244,region:"Northeast",tier:2},
+  {name:"Florida",capital:"Tallahassee",lat:30.4383,lng:-84.2807,region:"Southeast",tier:2},
+  {name:"Illinois",capital:"Springfield",lat:39.7984,lng:-89.6542,region:"Midwest",tier:2},
+  {name:"Kansas",capital:"Topeka",lat:39.0558,lng:-95.6890,region:"Midwest",tier:2},
+  {name:"Kentucky",capital:"Frankfort",lat:38.2009,lng:-84.8733,region:"Southeast",tier:3},
+  {name:"Louisiana",capital:"Baton Rouge",lat:30.4515,lng:-91.1871,region:"Southeast",tier:2},
+  {name:"Maine",capital:"Augusta",lat:44.3106,lng:-69.7795,region:"Northeast",tier:3},
+  {name:"Maryland",capital:"Annapolis",lat:38.9784,lng:-76.4922,region:"Mid-Atlantic",tier:2},
+  {name:"Michigan",capital:"Lansing",lat:42.7325,lng:-84.5555,region:"Midwest",tier:2},
+  {name:"Minnesota",capital:"Saint Paul",lat:44.9537,lng:-93.0900,region:"Midwest",tier:2},
+  {name:"Mississippi",capital:"Jackson",lat:32.2988,lng:-90.1848,region:"Southeast",tier:2},
+  {name:"Missouri",capital:"Jefferson City",lat:38.5767,lng:-92.1735,region:"Midwest",tier:3},
+  {name:"Montana",capital:"Helena",lat:46.5958,lng:-112.0270,region:"West",tier:3},
+  {name:"Nebraska",capital:"Lincoln",lat:40.8136,lng:-96.7026,region:"Midwest",tier:2},
+  {name:"New Hampshire",capital:"Concord",lat:43.2081,lng:-71.5376,region:"Northeast",tier:3},
+  {name:"New Jersey",capital:"Trenton",lat:40.2171,lng:-74.7429,region:"Mid-Atlantic",tier:2},
+  {name:"New York",capital:"Albany",lat:42.6526,lng:-73.7562,region:"Northeast",tier:2},
+  {name:"North Carolina",capital:"Raleigh",lat:35.7796,lng:-78.6382,region:"Southeast",tier:2},
+  {name:"North Dakota",capital:"Bismarck",lat:46.8083,lng:-100.7837,region:"Midwest",tier:3},
+  {name:"Oregon",capital:"Salem",lat:44.9429,lng:-123.0351,region:"West",tier:2},
+  {name:"Pennsylvania",capital:"Harrisburg",lat:40.2732,lng:-76.8867,region:"Mid-Atlantic",tier:2},
+  {name:"Rhode Island",capital:"Providence",lat:41.8240,lng:-71.4128,region:"Northeast",tier:2},
+  {name:"South Carolina",capital:"Columbia",lat:34.0007,lng:-81.0348,region:"Southeast",tier:2},
+  {name:"South Dakota",capital:"Pierre",lat:44.3683,lng:-100.3510,region:"Midwest",tier:3},
+  {name:"Vermont",capital:"Montpelier",lat:44.2601,lng:-72.5754,region:"Northeast",tier:3},
+  {name:"Washington",capital:"Olympia",lat:47.0379,lng:-122.9007,region:"West",tier:2},
+  {name:"West Virginia",capital:"Charleston",lat:38.3498,lng:-81.6326,region:"Mid-Atlantic",tier:2},
+  {name:"Wisconsin",capital:"Madison",lat:43.0731,lng:-89.4012,region:"Midwest",tier:2},
+  {name:"Wyoming",capital:"Cheyenne",lat:41.1400,lng:-104.8202,region:"West",tier:2},
+  {name:"Arkansas",capital:"Little Rock",lat:34.7465,lng:-92.2896,region:"Southeast",tier:2},
+  {name:"Iowa",capital:"Des Moines",lat:41.5868,lng:-93.6250,region:"Midwest",tier:2},
+];
+
+const US_ADJ = {
+  "Northeast":["Mid-Atlantic","Midwest"],
+  "Mid-Atlantic":["Northeast","Southeast","Midwest"],
+  "Southeast":["Mid-Atlantic","Midwest","Southwest"],
+  "Midwest":["Northeast","Mid-Atlantic","Southeast","Southwest","West"],
+  "Southwest":["Southeast","Midwest","West"],
+  "West":["Southwest","Midwest","Pacific"],
+  "Pacific":["West"],
+};
+
+/* ════════════════════════════════════════════
+   ENGINE CONSTANTS
+════════════════════════════════════════════ */
+const DIFF_META = {
+  1:{name:"Starter",cls:"d1",pips:1},
+  2:{name:"Explorer",cls:"d2",pips:2},
+  3:{name:"Expert",cls:"d3",pips:3},
+};
+const TIER_MIX = {
+  1:[{tier:1,count:10}],
+  2:[{tier:1,count:4},{tier:2,count:6}],
+  3:[{tier:1,count:1},{tier:2,count:4},{tier:3,count:5}],
+};
+const UP_THRESHOLD   = 0.70;
+const DOWN_THRESHOLD = 0.40;
+const GAME_LEN = 10;
+const RETRY_MAX = 3;
+
+/* ════════════════════════════════════════════
+   STATE
+════════════════════════════════════════════ */
+let map, marker, timerInterval;
+// Per game-type, keep separate state so switching doesn't reset progress
+let gameType = 'world'; // 'world' | 'us'
+let gameMode = 'capital';
+
+const state = {
+  world: { gameNum:0, score:0, streak:0, gameDiff:1, prevStats:null, weakLocs:[], tierPools:{1:[],2:[],3:[]}, gamePool:[], gameIdx:0, gameHistory:[] },
+  us:    { gameNum:0, score:0, streak:0, gameDiff:1, prevStats:null, weakLocs:[], tierPools:{1:[],2:[],3:[]}, gamePool:[], gameIdx:0, gameHistory:[] },
+};
+
+function gs(){ return state[gameType]; }
+function currentDataset(){ return gameType==='us' ? US_LOCS : WORLD_LOCS; }
+function currentAdj(){ return gameType==='us' ? US_ADJ : WORLD_ADJ; }
+function currentZoom(){ return gameType==='us' ? 5 : 4; }
+function placeName(){ return gameType==='us' ? 'state' : 'country'; }
+
+let curLoc, qType, correctAnswer, answered=false, phase=1, timeLeft=30;
+
+/* ════════════════════════════════════════════
+   MAP INIT
+════════════════════════════════════════════ */
+function initMap(){
+  map = L.map('map',{center:[20,0],zoom:2,zoomControl:true,attributionControl:false});
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',{maxZoom:12}).addTo(map);
+  resetTierPools('world');
+  resetTierPools('us');
+  // Show selection screen on first load — game starts after user picks
+  document.getElementById('game-select').style.display='flex';
+}
+
+/* ════════════════════════════════════════════
+   GAME SELECT SCREEN
+════════════════════════════════════════════ */
+function showGameSelect(){
+  clearTI();
+  document.getElementById('game-select').style.display='flex';
+}
+
+function selectGame(t){
+  document.getElementById('game-select').style.display='none';
+  if(gameType===t && gs().gamePool.length>0){
+    // Same game already running — just resume
+    return;
+  }
+  gameType = t;
+  clearTI();
+  hideResults();
+  updateModeLabels();
+  if(t==='us') map.flyTo([39.5,-98.35],4,{duration:1.2});
+  else map.flyTo([20,0],2,{duration:1.2});
+  syncHeaderStats();
+  updateDiffUI(gs().gameDiff);
+  buildGamePool();
+  renderDots();
+  setTimeout(()=>loadQuestion(), 500);
+}
+
+/* ════════════════════════════════════════════
+   GAME TYPE SWITCH
+════════════════════════════════════════════ */
+function switchGameType(t){
+  if(gameType===t) return;
+  gameType = t;
+  clearTI();
+  hideResults();
+  // Update mode bar labels
+  updateModeLabels();
+  // Fly map
+  if(t==='us') map.flyTo([39.5,-98.35],4,{duration:1.2});
+  else map.flyTo([20,0],2,{duration:1.2});
+  // Update header stats
+  syncHeaderStats();
+  updateDiffUI(gs().gameDiff);
+  buildGamePool();
+  renderDots();
+  setTimeout(()=>loadQuestion(), 400);
+}
+
+function updateModeLabels(){
+  const placeLabel = gameType==='us' ? 'States' : 'Countries';
+  document.getElementById('mb-place').textContent = placeLabel;
+  updateModeDesc();
+}
+
+function updateModeDesc(){
+  const descs = {
+    capital: 'Name the capital city',
+    place: gameType==='us' ? 'Name the state' : 'Name the country',
+    mixed: 'Capitals and ' + (gameType==='us' ? 'states' : 'countries'),
+  };
+  document.getElementById('mode-desc').textContent = descs[gameMode] || descs.capital;
+}
+
+function syncHeaderStats(){
+  const s = gs();
+  document.getElementById('sc').textContent = s.score;
+  document.getElementById('stk').textContent = s.streak;
+  document.getElementById('game-badge').textContent = 'Game ' + (s.gameNum||1);
+}
+
+/* ════════════════════════════════════════════
+   MODE
+════════════════════════════════════════════ */
+function setMode(m, el){
+  gameMode = m;
+  document.querySelectorAll('.mbtn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  updateModeDesc();
+  hideResults();
+  clearTI();
+  buildGamePool();
+  renderDots();
+  loadQuestion();
+}
+
+/* ════════════════════════════════════════════
+   POOL BUILDING
+════════════════════════════════════════════ */
+function resetTierPools(t){
+  const dataset = t==='us' ? US_LOCS : WORLD_LOCS;
+  [1,2,3].forEach(tier=>{
+    state[t].tierPools[tier] = dataset.filter(l=>l.tier===tier).sort(()=>Math.random()-.5);
+  });
+}
+
+function buildGamePool(){
+  const s = gs();
+  s.gameNum++;
+  s.gameIdx = 0;
+  s.gameHistory = [];
+  document.getElementById('game-badge').textContent = 'Game ' + s.gameNum;
+  document.getElementById('sc').textContent = s.score;
+  document.getElementById('stk').textContent = s.streak;
+  document.getElementById('qnum').textContent = '1/'+GAME_LEN;
+  updateDiffUI(s.gameDiff);
+
+  const retrySlots = Math.min(s.weakLocs.length, RETRY_MAX);
+  const retryLocs  = s.weakLocs.splice(0, retrySlots);
+  const freshCount = GAME_LEN - retrySlots;
+  const mix = TIER_MIX[s.gameDiff];
+  const freshLocs = [];
+  let assigned = 0;
+  const dataset = currentDataset();
+
+  mix.forEach((m, i)=>{
+    const isLast = i === mix.length-1;
+    const n = isLast ? (freshCount - assigned) : m.count;
+    let pool = s.tierPools[m.tier];
+    if(pool.length < n){
+      s.tierPools[m.tier] = dataset.filter(l=>l.tier===m.tier).sort(()=>Math.random()-.5);
+      pool = s.tierPools[m.tier];
+    }
+    freshLocs.push(...pool.splice(0, n));
+    assigned += n;
+  });
+
+  s.gamePool = [...retryLocs, ...freshLocs].sort(()=>Math.random()-.5);
+}
+
+function updateDiffUI(d){
+  const meta = DIFF_META[d];
+  document.querySelectorAll('#diff-pips .pip').forEach((p,i)=>{
+    p.className = 'pip' + (i < meta.pips ? ' on '+meta.cls : '');
+  });
+  document.getElementById('diff-name').textContent = meta.name;
+  document.getElementById('diff-name').className = 'diff-name '+meta.cls;
+}
+
+/* ════════════════════════════════════════════
+   QUESTION
+════════════════════════════════════════════ */
+function loadQuestion(){
+  answered=false; phase=1;
+  const s = gs();
+  curLoc = s.gamePool[s.gameIdx];
+  if(!curLoc) return; // safety
+  qType = (gameMode==='mixed') ? (Math.random()>.5?'capital':'place') : gameMode;
+  correctAnswer = qType==='capital' ? curLoc.capital : curLoc.name;
+
+  document.getElementById('qnum').textContent = (s.gameIdx+1)+'/'+GAME_LEN;
+  document.getElementById('prog-label').textContent = (s.gameIdx+1)+'/'+GAME_LEN;
+  document.getElementById('question-text').innerHTML = qType==='capital'
+    ? `What is the capital of <strong>${curLoc.name}</strong>?`
+    : `<strong>${curLoc.capital}</strong> is the capital of which ${placeName()}?`;
+  document.getElementById('region-tag').textContent = curLoc.region;
+
+  renderDots();
+  showPhase1();
+  flyTo(curLoc.lat, curLoc.lng);
+}
+
+/* ════════════════════════════════════════════
+   PHASE 1
+════════════════════════════════════════════ */
+function showPhase1(){
+  setPill('p1','Phase 1 — Recall');
+  document.getElementById('timer-wrap').style.display='block';
+  document.getElementById('input-area').style.display='block';
+  document.getElementById('p2-intro').style.display='none';
+  document.getElementById('choices-area').style.display='none';
+  hideFB();
+  const inp=document.getElementById('geo-input');
+  inp.value=''; inp.className='geo-input'; inp.disabled=false;
+  setTimeout(()=>inp.focus(), 80);
+  timeLeft=30; updateTimerUI();
+  timerInterval=setInterval(()=>{
+    timeLeft--; updateTimerUI();
+    if(timeLeft<=0){ clearTI(); failPhase1('timeout'); }
+  }, 1000);
+}
+
+function updateTimerUI(){
+  const pct=(timeLeft/30)*100;
+  const bar=document.getElementById('timer-bar');
+  const num=document.getElementById('timer-num');
+  bar.style.width=pct+'%';
+  num.textContent=timeLeft+'s';
+  const cls=timeLeft<=5?'danger':timeLeft<=10?'warn':'';
+  bar.className='timer-bar-fill'+(cls?' '+cls:'');
+  num.className='timer-count'+(cls?' '+cls:'');
+}
+
+function submitFreeText(){
+  if(answered) return;
+  const inp=document.getElementById('geo-input');
+  const val=inp.value.trim();
+  if(!val) return;
+  if(match(val, correctAnswer)){
+    clearTI(); answered=true;
+    inp.className='geo-input correct-flash'; inp.disabled=true;
+    const s=gs();
+    const pts=200+s.streak*15; s.score+=pts; s.streak++;
+    document.getElementById('sc').textContent=s.score;
+    document.getElementById('stk').textContent=s.streak;
+    gs().gameHistory.push('p1c');
+    renderDots(); setMarker('green');
+    showFB('ok', s.streak>1?`Excellent! 🔥 ${s.streak} streak`:'Correct!',
+      `+${pts} pts — unaided`,
+      `${curLoc.capital} is the capital of ${curLoc.name}.`,'full');
+  } else {
+    inp.className='geo-input wrong-flash';
+    setTimeout(()=>{ inp.className='geo-input'; inp.value=''; inp.focus(); }, 500);
+  }
+}
+
+function failPhase1(reason){
+  if(answered) return;
+  clearTI();
+  gs().streak=0; document.getElementById('stk').textContent='0';
+  setPill('p2','Phase 2 — Choose');
+  document.getElementById('timer-wrap').style.display='none';
+  document.getElementById('input-area').style.display='none';
+  const intro=document.getElementById('p2-intro');
+  intro.style.display='block';
+  intro.innerHTML=reason==='timeout'
+    ?`<strong>Time's up!</strong> Options are from the <strong>${curLoc.region}</strong> area:`
+    :`Choose carefully — all options are from the <strong>${curLoc.region}</strong> area:`;
+
+  const field=qType==='capital'?'capital':'name';
+  const wrong=getDistractors(curLoc, field, 2);
+  const opts=[correctAnswer,...wrong].sort(()=>Math.random()-.5);
+  const ca=document.getElementById('choices-area');
+  ca.innerHTML=''; ca.style.display='flex';
+  ['A','B','C'].forEach((ltr,i)=>{
+    const btn=document.createElement('button');
+    btn.className='choice';
+    btn.innerHTML=`<span class="ltr">${ltr}</span>${opts[i]}`;
+    btn.onclick=()=>checkMC(opts[i],btn);
+    ca.appendChild(btn);
+  });
+}
+
+function checkMC(selected, btn){
+  if(answered) return;
+  answered=true;
+  document.querySelectorAll('.choice').forEach(b=>b.disabled=true);
+  if(match(selected, correctAnswer)){
+    btn.classList.add('correct');
+    gs().score+=80; document.getElementById('sc').textContent=gs().score;
+    gs().gameHistory.push('p2c');
+    renderDots(); setMarker('green');
+    showFB('ok','Correct!','+80 pts — with hints',
+      `${curLoc.capital} is the capital of ${curLoc.name}.`,'half');
+  } else {
+    btn.classList.add('wrong');
+    document.querySelectorAll('.choice').forEach(b=>{
+      if(match(b.textContent.slice(1).trim(), correctAnswer)) b.classList.add('correct');
+    });
+    gs().gameHistory.push('miss');
+    renderDots(); setMarker('red');
+    showFB('nope','Missed this one.',null,
+      `The answer is ${correctAnswer}. ${curLoc.capital} is the capital of ${curLoc.name}.`,'zero');
+  }
+}
+
+/* ════════════════════════════════════════════
+   ADVANCE / END GAME
+════════════════════════════════════════════ */
+function advance(){
+  const s=gs();
+  s.gameIdx++;
+  if(s.gameIdx>=GAME_LEN) endGame();
+  else loadQuestion();
+}
+
+function endGame(){
+  clearTI();
+  const s=gs();
+  const p1c=s.gameHistory.filter(h=>h==='p1c').length;
+  const p2c=s.gameHistory.filter(h=>h==='p2c').length;
+  const miss=s.gameHistory.filter(h=>h==='miss').length;
+  const curStats={score:s.score,p1c,p2c,miss,diff:s.gameDiff};
+
+  const missL=[], p2cL=[];
+  s.gameHistory.forEach((h,i)=>{
+    if(h==='miss') missL.push(s.gamePool[i]);
+    else if(h==='p2c') p2cL.push(s.gamePool[i]);
+  });
+  s.weakLocs=[...missL,...p2cL];
+
+  const p1cRate=p1c/GAME_LEN;
+  const nextDiff=calcNextDiff(s.gameDiff, p1cRate);
+  renderResults(curStats, s.prevStats, s.gameHistory, s.gamePool);
+  s.gameDiff=nextDiff;
+  s.prevStats=curStats;
+}
+
+function calcNextDiff(current, p1cRate){
+  if(p1cRate>=UP_THRESHOLD && current<3) return current+1;
+  if(p1cRate<DOWN_THRESHOLD && current>1) return current-1;
+  return current;
+}
+
+/* ════════════════════════════════════════════
+   RESULTS
+════════════════════════════════════════════ */
+function renderResults(cur, prev, history, pool){
+  const s=gs();
+  document.getElementById('res-game-num').textContent=`Game ${s.gameNum} Complete`;
+  document.getElementById('res-score-val').textContent=cur.score;
+  document.getElementById('next-game-num').textContent=s.gameNum+1;
+
+  const accPct=Math.round(((cur.p1c+cur.p2c)/GAME_LEN)*100);
+  document.getElementById('res-acc-pct').textContent=accPct+'%';
+
+  const pct1=(cur.p1c/GAME_LEN)*100;
+  let title,sub;
+  if(pct1>=90){title='Outstanding!';sub='Near-perfect recall — you\'re a geography ace.';}
+  else if(pct1>=70){title='Great work!';sub='Strong performance — keep building on it.';}
+  else if(pct1>=50){title='Good effort!';sub='More than half unaided — solid progress.';}
+  else if(pct1>=30){title='Keep going!';sub='Every game builds your knowledge.';}
+  else{title='Good start!';sub='Geography takes time — you\'ll improve fast.';}
+  document.getElementById('res-title').textContent=title;
+  document.getElementById('res-subtitle').textContent=sub;
+  document.getElementById('res-acc-sub').textContent=
+    cur.p1c>0?`${cur.p1c} answered without any help`:'Keep practising — you\'ll get there!';
+
+  // Score change
+  const badge=document.getElementById('res-score-change');
+  if(prev){
+    const diff=cur.score-prev.score;
+    badge.className='res-score-change '+(diff>0?'up':diff<0?'down':'same');
+    badge.textContent=(diff>0?'▲ +':'▼ ')+Math.abs(diff)+' vs last game';
+    badge.style.display='';
+  } else { badge.style.display='none'; }
+
+  // Breakdown bar
+  const bar=document.getElementById('res-breakdown-bar');
+  bar.innerHTML='';
+  [{n:cur.p1c,cls:'green'},{n:cur.p2c,cls:'amber'},{n:cur.miss,cls:'red'}].forEach(seg=>{
+    if(seg.n>0){
+      const d=document.createElement('div');
+      d.className='bb-seg '+seg.cls;
+      d.style.width=((seg.n/GAME_LEN)*100)+'%';
+      bar.appendChild(d);
+    }
+  });
+  document.getElementById('res-p1c-l').textContent=`${cur.p1c} unaided`;
+  document.getElementById('res-p2c-l').textContent=`${cur.p2c} with hints`;
+  document.getElementById('res-miss-l').textContent=`${cur.miss} missed`;
+
+  // Missed list
+  const ml=document.getElementById('missed-list');
+  ml.innerHTML='';
+  const reviewItems=[
+    ...history.map((h,i)=>({h,loc:pool[i]})).filter(x=>x.h==='miss'),
+    ...history.map((h,i)=>({h,loc:pool[i]})).filter(x=>x.h==='p2c'),
+  ];
+  if(reviewItems.length===0){
+    ml.innerHTML='<div class="no-missed">Perfect game — nothing to review! 🎉</div>';
+  } else {
+    reviewItems.forEach(({h,loc})=>{
+      const el=document.createElement('div');
+      el.className='missed-item';
+      el.innerHTML=`<div><div class="missed-country">${loc.name}</div><div class="missed-capital">${loc.capital}</div></div>
+        <div class="missed-tag ${h==='miss'?'miss':'hint'}">${h==='miss'?'Missed':'Needed hint'}</div>`;
+      ml.appendChild(el);
+    });
+  }
+
+  // Compare bars
+  if(prev){
+    document.getElementById('res-compare').style.display='block';
+    setBar('p1c',prev.p1c/GAME_LEN,cur.p1c/GAME_LEN);
+    setBar('p2c',prev.p2c/GAME_LEN,cur.p2c/GAME_LEN);
+    setBar('miss',prev.miss/GAME_LEN,cur.miss/GAME_LEN);
+  } else {
+    document.getElementById('res-compare').style.display='none';
+  }
+
+  showResults();
+}
+
+function setBar(key,prevPct,curPct){
+  document.getElementById('cmp-'+key+'-prev').style.width=(prevPct*100)+'%';
+  document.getElementById('cmp-'+key+'-prev-l').textContent=Math.round(prevPct*100)+'%';
+  document.getElementById('cmp-'+key+'-cur').style.width=(curPct*100)+'%';
+  document.getElementById('cmp-'+key+'-cur-l').textContent=Math.round(curPct*100)+'%';
+}
+
+function showResults(){ document.getElementById('results-overlay').classList.add('show'); }
+function hideResults(){ document.getElementById('results-overlay').classList.remove('show'); }
+
+function startNextGame(){
+  hideResults();
+  buildGamePool();
+  renderDots();
+  loadQuestion();
+}
+
+/* ════════════════════════════════════════════
+   PROGRESS DOTS
+════════════════════════════════════════════ */
+function renderDots(){
+  const s=gs();
+  const wrap=document.getElementById('prog-dots');
+  wrap.innerHTML='';
+  for(let i=0;i<GAME_LEN;i++){
+    const d=document.createElement('div');
+    if(i<s.gameHistory.length) d.className='pdot '+s.gameHistory[i];
+    else if(i===s.gameIdx) d.className='pdot cur';
+    else d.className='pdot empty';
+    wrap.appendChild(d);
+  }
+}
+
+/* ════════════════════════════════════════════
+   SMART DISTRACTORS
+════════════════════════════════════════════ */
+function getDistractors(loc, field, n){
+  const dataset=currentDataset();
+  const adj=currentAdj();
+  const same=dataset.filter(l=>l.region===loc.region&&l[field]!==loc[field]);
+  const adjLocs=(adj[loc.region]||[]).flatMap(r=>dataset.filter(l=>l.region===r&&l[field]!==loc[field]));
+  const combined=[...same,...adjLocs].sort(()=>Math.random()-.5);
+  const seen=new Set([loc[field]]);
+  const out=[];
+  for(const l of combined){
+    if(!seen.has(l[field])){ seen.add(l[field]); out.push(l[field]); }
+    if(out.length>=n) break;
+  }
+  while(out.length<n){
+    const fb=dataset.find(l=>!seen.has(l[field]));
+    if(fb){ out.push(fb[field]); seen.add(fb[field]); } else break;
+  }
+  return out.slice(0,n);
+}
+
+/* ════════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════════ */
+function match(a,b){
+  const n=s=>s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9 ]/g,'').trim();
+  const na=n(a),nb=n(b);
+  return na===nb||(nb.startsWith(na)&&na.length>=4);
+}
+
+function showFB(type,msg,pts,detail,ptsClass){
+  if(type==='ok'){ document.getElementById('fb-ok').textContent=msg; document.getElementById('fb-ok').classList.add('show'); }
+  else{ document.getElementById('fb-nope').textContent=msg; document.getElementById('fb-nope').classList.add('show'); }
+  const pe=document.getElementById('fb-pts');
+  if(pts){ pe.textContent=pts; pe.className='fb-pts show '+ptsClass; }
+  document.getElementById('fb-detail').textContent=detail;
+  document.getElementById('fb-detail').classList.add('show');
+  const nb=document.getElementById('next-btn');
+  nb.textContent=gs().gameIdx===GAME_LEN-1?'See results →':'Next question →';
+  nb.classList.add('show');
+}
+
+function hideFB(){
+  ['fb-ok','fb-nope','fb-detail','next-btn'].forEach(id=>document.getElementById(id).classList.remove('show'));
+  document.getElementById('fb-pts').className='fb-pts';
+}
+
+function setPill(cls,label){
+  const p=document.getElementById('phase-pill');
+  p.className='phase-pill '+cls;
+  document.getElementById('phase-label').textContent=label;
+}
+
+function clearTI(){ if(timerInterval){ clearInterval(timerInterval); timerInterval=null; } }
+
+function flyTo(lat,lng){
+  if(marker) map.removeLayer(marker);
+  const icon=L.divIcon({className:'',
+    html:`<div style="width:16px;height:16px;background:#c9924a;border:3px solid #e8b470;border-radius:50%;animation:rpl 1.5s infinite"></div>
+    <style>@keyframes rpl{0%{box-shadow:0 0 0 0 rgba(201,146,74,.5)}100%{box-shadow:0 0 0 18px rgba(201,146,74,0)}}</style>`,
+    iconSize:[16,16],iconAnchor:[8,8]});
+  marker=L.marker([lat,lng],{icon}).addTo(map);
+  map.flyTo([lat,lng], currentZoom(), {duration:1.3,easeLinearity:.25});
+}
+
+function setMarker(color){
+  if(!marker) return;
+  const c={green:['#3dba6f','#6de09a'],red:['#e05555','#f08080']}[color];
+  marker.setIcon(L.divIcon({className:'',
+    html:`<div style="width:18px;height:18px;background:${c[0]};border:3px solid ${c[1]};border-radius:50%"></div>`,
+    iconSize:[18,18],iconAnchor:[9,9]}));
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&phase===1&&!answered) submitFreeText();
+});
+
+window.onload=initMap;
+</script>
+</body>
+</html>
